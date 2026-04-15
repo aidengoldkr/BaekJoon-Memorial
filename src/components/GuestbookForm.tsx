@@ -11,7 +11,7 @@ interface GuestbookEntry {
   content: string;
   flower_count: number;
   created_at: string;
-  profiles?: { nickname: string | null; tier: string | null } | null;
+  profiles?: { nickname: string | null; tier: string | null }[] | { nickname: string | null; tier: string | null } | null;
 }
 
 interface Props {
@@ -20,6 +20,11 @@ interface Props {
 }
 
 const MAX_LENGTH = 140;
+
+function getProfile(profiles: GuestbookEntry["profiles"]) {
+  if (!profiles) return null;
+  return Array.isArray(profiles) ? profiles[0] ?? null : profiles;
+}
 
 export function GuestbookForm({ initialEntries, userEmail }: Props) {
   const [entries, setEntries] = useState(initialEntries);
@@ -57,7 +62,8 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
 
   return (
     <div className={styles.container}>
-      {userEmail ? (
+      {/* 작성 폼 — 비로그인 시 blur overlay 표시 */}
+      <div className={styles.writeSection}>
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.textareaWrapper}>
             <textarea
@@ -67,6 +73,7 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
               placeholder="백준에게 마지막 한마디를 남겨주세요..."
               rows={3}
               className={styles.textarea}
+              disabled={!userEmail}
             />
             <span className={styles.charCount}>
               {content.length}/{MAX_LENGTH}
@@ -75,32 +82,37 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
           {error && <p className={styles.error}>{error}</p>}
           <button
             type="submit"
-            disabled={isPending || content.trim().length === 0}
+            disabled={isPending || content.trim().length === 0 || !userEmail}
             className={styles.submitBtn}
           >
             {isPending ? "등록 중..." : "방명록 남기기"}
           </button>
         </form>
-      ) : (
-        <p className={styles.loginPrompt}>
-          방명록을 남기려면{" "}
-          <a href="/login" className={styles.loginLink}>
-            로그인
-          </a>
-          이 필요합니다.
-        </p>
-      )}
 
+        {/* 비로그인 blur overlay */}
+        {!userEmail && (
+          <div className={styles.blurOverlay}>
+            <p className={styles.blurOverlayTitle}>
+              🌸 로그인하고 방명록을 남겨보세요
+            </p>
+            <a href="/login" className={styles.blurOverlayBtn}>
+              Google로 로그인하기
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* 방명록 목록 — 항상 표시 */}
       <ul className={styles.entries}>
         {entries.map((entry) => (
           <li key={entry.id} className={styles.entry}>
             <div className={styles.entryBody}>
               <div className={styles.entryMeta}>
                 <span className={styles.nickname}>
-                  {entry.profiles?.nickname ?? entry.email.split("@")[0]}
+                  {getProfile(entry.profiles)?.nickname ?? entry.email.split("@")[0]}
                 </span>
-                {entry.profiles?.tier && (
-                  <span>[{entry.profiles.tier}]</span>
+                {getProfile(entry.profiles)?.tier && (
+                  <span>[{getProfile(entry.profiles)?.tier}]</span>
                 )}
                 <span>{new Date(entry.created_at).toLocaleDateString("ko-KR")}</span>
               </div>

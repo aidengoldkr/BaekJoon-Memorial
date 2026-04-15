@@ -1,9 +1,17 @@
 import Link from 'next/link';
 import { CountdownTimer } from '@/components/CountdownTimer';
 import { MessageMarquee } from '@/components/MessageMarquee';
+import { GuestbookForm } from '@/components/GuestbookForm';
+import { auth } from '@/lib/auth';
+import { getGuestbookEntries } from '@/app/actions/guestbook';
 import styles from './page.module.css';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const [session, entries] = await Promise.all([
+    auth(),
+    getGuestbookEntries(),
+  ]);
+
   return (
     <main className={styles.main}>
       {/* 1. 배경: 방명록 마키 */}
@@ -13,32 +21,27 @@ export default function LandingPage() {
         <MessageMarquee speed="normal" direction="left" />
       </div>
 
-      {/* 2. 메인 컨텐츠 섹션 */}
+      {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
-        {/* 히어로 타이틀 */}
         <h1 className={styles.title}>
           Good Bye! <span className={styles.titleAccent}>BOJ!</span>
         </h1>
 
-        {/* 섭종 카운트다운 */}
         <div className={styles.countdownWrapper}>
           <CountdownTimer targetDate="2026-04-28T00:00:00" />
         </div>
 
-        {/* 헌정 문구 */}
         <p className={styles.description}>
           16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
           수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 푸른 봄을 기록합니다.
         </p>
 
-        {/* CTA 버튼 */}
         <div className={styles.ctaGroup}>
-          <Link href="/login" className={styles.ctaButton}>
-            로그인하고 방명록 남기기
+          <Link href="#guestbook" className={styles.ctaButton}>
+            방명록 남기기 ↓
           </Link>
         </div>
 
-        {/* 하단 공식 링크 영역 */}
         <div className={styles.footer}>
           <a
             href="https://www.acmicpc.net/board/view/165799"
@@ -54,6 +57,20 @@ export default function LandingPage() {
           >
             solved.ac 공식 문서
           </a>
+        </div>
+      </section>
+
+      {/* 3. 방명록 섹션 */}
+      <section id="guestbook" className={styles.guestbookSection}>
+        <div className={styles.guestbookInner}>
+          <h2 className={styles.guestbookTitle}>추모 방명록</h2>
+          <p className={styles.guestbookSubtitle}>
+            백준에게 마지막 한마디를 남겨주세요.
+          </p>
+          <GuestbookForm
+            initialEntries={entries}
+            userEmail={session?.user?.email ?? null}
+          />
         </div>
       </section>
     </main>

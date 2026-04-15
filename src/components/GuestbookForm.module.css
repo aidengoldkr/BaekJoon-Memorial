@@ -75,16 +75,48 @@
   cursor: not-allowed;
 }
 
-.loginPrompt {
-  color: #64748b;
-  font-size: 0.875rem;
+/* 작성 폼 래퍼 (blur overlay 기준점) */
+.writeSection {
+  position: relative;
+  width: 100%;
+}
+
+/* 비로그인 blur overlay */
+.blurOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background: rgba(2, 6, 23, 0.55);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.blurOverlayTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
   text-align: center;
 }
 
-.loginLink {
-  color: #60a5fa;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.blurOverlayBtn {
+  padding: 0.625rem 1.5rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.blurOverlayBtn:hover {
+  background-color: #3b82f6;
 }
 
 .entries {

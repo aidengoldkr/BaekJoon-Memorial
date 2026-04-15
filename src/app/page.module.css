@@ -97,3 +97,33 @@
 .footerLink:hover {
   color: #cbd5e1;
 }
+
+/* ── 방명록 섹션 ── */
+.guestbookSection {
+  position: relative;
+  z-index: 10;
+  background-color: #020617;
+  padding: 5rem 1rem 6rem;
+  border-top: 1px solid #1e293b;
+}
+
+.guestbookInner {
+  max-width: 42rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.guestbookTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.guestbookSubtitle {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+}

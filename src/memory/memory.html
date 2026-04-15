@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/memory.css">
+</head>
+<body>
+    <div class="toolbar">
+        <input id="input" placeholder="댓글 입력" maxlength="120">
+        <button onclick="send()">전송</button>
+    </div>
+
+    <div id="board"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const board = document.getElementById('board');
+        const input = document.getElementById('input');
+        const TOP_PADDING = 72;
+        const BOTTOM_PADDING = 16;
+        const COMMENT_HEIGHT = 34;
+        const COMMENT_SPEED = 90;
+        const COMMENT_GAP = 10;
+        const TICK_MS = 150;
+        let pool = [];
+        let queue = [];
+        let poolCursor = 0;
+        let activeComments = [];
+        let tickerId = null;
+        let isPaused = false;
+
+        function resetActiveComments() {
+            activeComments = activeComments.filter((item) => {
+                if (!item.el.isConnected) {
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        function getCurrentLeft(item) {
+            const elapsed = (performance.now() - item.startAt) / 1000;
+            return item.startLeft - elapsed * COMMENT_SPEED;
+        }
+
+        function canPlaceComment(top, width) {
+            const left = board.clientWidth + 20;
+            const right = left + width;
+            const bottom = top + COMMENT_HEIGHT;
+
+            return activeComments.every((item) => {
+                const itemLeft = getCurrentLeft(item);
+                const itemRight = itemLeft + item.width;
+                const itemBottom = item.top + item.height;
+
+                const overlapsX = right > itemLeft - COMMENT_GAP && left < itemRight + COMMENT_GAP;
+                const overlapsY = bottom > item.top - COMMENT_GAP && top < itemBottom + COMMENT_GAP;
+                return !(overlapsX && overlapsY);
+            });
+        }
+
+        function randomTop() {
+            const minTop = TOP_PADDING;
+            const maxTop = Math.max(TOP_PADDING, board.clientHeight - BOTTOM_PADDING - COMMENT_HEIGHT);
+            return minTop + Math.random() * Math.max(1, maxTop - minTop);
+        }
+
+        function ensureInPool(comment) {
+            if (!comment || !comment.text) return;
+            if (comment.id && pool.some((item) => item.id === comment.id)) return;
+            pool.push(comment);
+        }
+
+        function mergeComments(items) {
+            if (!Array.isArray(items)) return;
+            items.forEach(ensureInPool);
+        }
+
+        function nextComment() {
+            if (queue.length > 0) {
+                return queue.shift();
+            }
+            if (pool.length === 0) {
+                return null;
+            }
+            const item = pool[poolCursor % pool.length];
+            poolCursor += 1;
+            return item;
+        }
+
+        function findTopForComment(width) {
+            const tryCount = 40;
+            for (let i = 0; i < tryCount; i += 1) {
+                const top = randomTop();
+                if (canPlaceComment(top, width)) {
+                    return top;
+                }
+            }
+
+            for (let y = TOP_PADDING; y < board.clientHeight - BOTTOM_PADDING - COMMENT_HEIGHT; y += 6) {
+                if (canPlaceComment(y, width)) {
+                    return y;
+                }
+            }
+            return null;
+        }
+
+        function measureCommentWidth(text) {
+            const probe = document.createElement('div');
+            probe.className = 'comment';
+            probe.style.visibility = 'hidden';
+            probe.style.left = '-9999px';
+            probe.style.top = '-9999px';
+            probe.innerText = text;
+            board.appendChild(probe);
+            const width = probe.offsetWidth;
+            probe.remove();
+            return width;
+        }
+
+        function plotComment(data) {
+            const width = measureCommentWidth(data.text);
+            const top = findTopForComment(width);
+            if (top === null) {
+                return false;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'comment';
+            div.innerText = data.text;
+            const startLeft = board.clientWidth + 20;
+            div.style.left = `${startLeft}px`;
+            div.style.top = `${top}px`;
+            div.style.transform = 'translateX(0)';
+
+            board.appendChild(div);
+
+            const travel = board.clientWidth + width + 60;
+            const duration = travel / COMMENT_SPEED;
+            const activeItem = {
+                el: div,
+                top,
+                height: COMMENT_HEIGHT,
+                width,
+                startLeft,
+                startAt: performance.now()
+            };
+            activeComments.push(activeItem);
+
+            div.style.transition = `transform ${duration}s linear`;
+            requestAnimationFrame(() => {
+                div.style.transform = `translateX(-${travel}px)`;
+            });
+
+            div.addEventListener('transitionend', () => {
+                activeComments = activeComments.filter((item) => item.el !== div);
+                div.remove();
+            });
+            return true;
+        }
+
+        function tick() {
+            if (isPaused) {
+                return;
+            }
+            if (document.hidden) {
+                return;
+            }
+            if (board.clientWidth < 200 || board.clientHeight < 200) {
+                return;
+            }
+            resetActiveComments();
+            const comment = nextComment();
+            if (!comment) {
+                return;
+            }
+            const plotted = plotComment(comment);
+            if (!plotted) {
+                queue.push(comment);
+            }
+        }
+
+        function startTicker() {
+            if (tickerId) return;
+            tickerId = setInterval(tick, TICK_MS);
+        }
+
+        function stopTicker() {
+            if (!tickerId) return;
+            clearInterval(tickerId);
+            tickerId = null;
+        }
+
+        function pauseFlow() {
+            isPaused = true;
+            stopTicker();
+        }
+
+        function resumeFlow() {
+            isPaused = false;
+            startTicker();
+        }
+
+        async function loadPersistedComments() {
+            try {
+                const response = await fetch('/memory__comments.json', { cache: 'no-store' });
+                if (!response.ok) {
+                    return;
+                }
+                const items = await response.json();
+                mergeComments(items);
+                startTicker();
+            } catch (error) {
+                // memory__comments.json이 아직 없는 초기 상태일 수 있다.
+            }
+        }
+
+        function send() {
+            const text = input.value.trim();
+            if (!text) return;
+            socket.emit('comment', { text });
+            input.value = '';
+            input.focus();
+        }
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                send();
+            }
+        });
+
+        socket.on('comments:init', (items) => {
+            mergeComments(items);
+            startTicker();
+        });
+
+        socket.on('comment:new', (data) => {
+            ensureInPool(data);
+            queue.push(data);
+        });
+
+        window.addEventListener('resize', () => {
+            resetActiveComments();
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                pauseFlow();
+                return;
+            }
+            resumeFlow();
+        });
+
+        loadPersistedComments();
+    </script>
+</body>
+</html>

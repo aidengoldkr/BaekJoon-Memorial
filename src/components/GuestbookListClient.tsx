@@ -33,7 +33,7 @@ export function GuestbookListClient({
   currentUserEmail,
 }: Props) {
   const { data, isFetching } = useQuery({
-    queryKey: ["guestbook", page, sort],
+    queryKey: ["guestbook", page, sort, currentUserEmail ?? ""],
     queryFn:  () => getGuestbookPage(page, pageSize, sort),
     initialData: { entries: initialEntries as any, total: initialTotal },
     placeholderData: (prev) => prev,

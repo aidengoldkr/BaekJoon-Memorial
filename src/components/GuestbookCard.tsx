@@ -20,9 +20,8 @@ export interface GuestbookEntry {
   flower_count: number;
   created_at: string;
   profiles?: Profile[] | Profile | null;
+  user_liked?: boolean;
 }
-
-const STORAGE_KEY = "boj_liked_entries";
 
 function resolveProfile(profiles: GuestbookEntry["profiles"]): Profile | null {
   if (!profiles) return null;
@@ -31,9 +30,10 @@ function resolveProfile(profiles: GuestbookEntry["profiles"]): Profile | null {
 
 export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEntry; currentUserEmail?: string | null }) {
   const [likes, setLikes] = useState(entry.flower_count);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(entry.user_liked ?? false);
   const [pending, setPending] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+  const pendingRef = useRef(false);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(entry.content);
@@ -45,13 +45,13 @@ export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEnt
   const profile = resolveProfile(entry.profiles);
   const displayName = profile?.nickname ?? entry.email.split("@")[0];
 
-  // localStorage에서 좋아요 여부 복원
+  // 서버 데이터가 바뀌면(리페치, 유저 전환) 로컬 상태 동기화
+  // pendingRef=true(서버 액션 진행 중)일 때는 optimistic 상태 유지
   useEffect(() => {
-    try {
-      const ids: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-      setLiked(ids.includes(entry.id));
-    } catch {}
-  }, [entry.id]);
+    if (pendingRef.current) return;
+    setLiked(entry.user_liked ?? false);
+    setLikes(entry.flower_count);
+  }, [entry.id, entry.user_liked, entry.flower_count]);
 
   // 팝업 외부 클릭 닫기
   useEffect(() => {
@@ -71,6 +71,7 @@ export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEnt
       return;
     }
     if (pending) return;
+    pendingRef.current = true;
     setPending(true);
 
     const wasLiked = liked;
@@ -79,15 +80,9 @@ export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEnt
     setLikes((n) => n + (wasLiked ? -1 : 1));
 
     try {
-      const ids: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-      let result;
-      if (wasLiked) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.filter((i) => i !== entry.id)));
-        result = await removeFlower(entry.id);
-      } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids, entry.id]));
-        result = await addFlower(entry.id);
-      }
+      const result = wasLiked
+        ? await removeFlower(entry.id)
+        : await addFlower(entry.id);
 
       if (result && !result.success) {
         alert(result.error);
@@ -98,6 +93,7 @@ export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEnt
       setLiked(wasLiked);
       setLikes((n) => n + (wasLiked ? 1 : -1));
     } finally {
+      pendingRef.current = false;
       setPending(false);
     }
   };

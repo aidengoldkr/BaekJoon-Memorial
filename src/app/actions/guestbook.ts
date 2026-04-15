@@ -28,6 +28,20 @@ async function fetchProfileMap(emails: string[]) {
   );
 }
 
+// ── 내부 헬퍼: 현재 유저가 좋아요한 entry_id 집합 조회 ──────────────
+async function fetchLikedIds(entryIds: string[], userEmail: string): Promise<Set<string>> {
+  if (entryIds.length === 0) return new Set();
+
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("guestbook_likes")
+    .select("entry_id")
+    .eq("email", userEmail)
+    .in("entry_id", entryIds);
+
+  return new Set((data ?? []).map((r) => r.entry_id));
+}
+
 type ProfileData = {
   nickname: string | null;
   tier: string | null;
@@ -94,6 +108,8 @@ export async function createGuestbookEntry(content: string) {
 // ── 최근 방명록 조회 (메인 페이지 마키·폼 용) ─────────────────────────
 export async function getGuestbookEntries(limit = 100) {
   const supabase = createClient();
+  const session = await auth();
+  const userEmail = session?.user?.email ?? null;
 
   const { data, error } = await supabase
     .from("guestbooks")
@@ -103,11 +119,15 @@ export async function getGuestbookEntries(limit = 100) {
 
   if (error || !data) return [];
 
-  const profileMap = await fetchProfileMap(data.map((e) => e.email));
+  const [profileMap, likedIds] = await Promise.all([
+    fetchProfileMap(data.map((e) => e.email)),
+    userEmail ? fetchLikedIds(data.map((e) => e.id), userEmail) : Promise.resolve(new Set<string>()),
+  ]);
 
   return data.map((entry) => ({
     ...entry,
     profiles: profileMap.get(entry.email) ?? null,
+    user_liked: likedIds.has(entry.id),
   }));
 }
 
@@ -118,6 +138,8 @@ export async function getGuestbookPage(
   sort: "latest" | "likes" = "latest"
 ) {
   const supabase = createClient();
+  const session = await auth();
+  const userEmail = session?.user?.email ?? null;
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
@@ -137,12 +159,16 @@ export async function getGuestbookPage(
 
   if (error || !data) return { entries: [], total: 0 };
 
-  const profileMap = await fetchProfileMap(data.map((e) => e.email));
+  const [profileMap, likedIds] = await Promise.all([
+    fetchProfileMap(data.map((e) => e.email)),
+    userEmail ? fetchLikedIds(data.map((e) => e.id), userEmail) : Promise.resolve(new Set<string>()),
+  ]);
 
   return {
     entries: data.map((entry) => ({
       ...entry,
       profiles: profileMap.get(entry.email) ?? null,
+      user_liked: likedIds.has(entry.id),
     })),
     total: count ?? 0,
   };
@@ -155,24 +181,12 @@ export async function addFlower(id: string) {
     return { success: false, error: "로그인이 필요합니다." };
 
   const supabase = createServiceClient();
+  const { error } = await supabase.rpc("add_flower", {
+    p_entry_id: id,
+    p_email: session.user.email,
+  });
 
-  const { error } = await supabase.rpc("increment_flower_count", { row_id: id });
-
-  if (error) {
-    const { data: entry } = await supabase
-      .from("guestbooks")
-      .select("flower_count")
-      .eq("id", id)
-      .single();
-
-    if (entry) {
-      await supabase
-        .from("guestbooks")
-        .update({ flower_count: entry.flower_count + 1 })
-        .eq("id", id);
-    }
-  }
-
+  if (error) return { success: false, error: error.message };
   return { success: true };
 }
 
@@ -183,20 +197,12 @@ export async function removeFlower(id: string) {
     return { success: false, error: "로그인이 필요합니다." };
 
   const supabase = createServiceClient();
+  const { error } = await supabase.rpc("remove_flower", {
+    p_entry_id: id,
+    p_email: session.user.email,
+  });
 
-  const { data: entry } = await supabase
-    .from("guestbooks")
-    .select("flower_count")
-    .eq("id", id)
-    .single();
-
-  if (entry) {
-    await supabase
-      .from("guestbooks")
-      .update({ flower_count: Math.max(0, entry.flower_count - 1) })
-      .eq("id", id);
-  }
-
+  if (error) return { success: false, error: error.message };
   return { success: true };
 }
 
@@ -254,11 +260,15 @@ export async function getMyGuestbooks() {
 
   if (error || !data) return [];
 
-  const profileMap = await fetchProfileMap([session.user.email]);
+  const [profileMap, likedIds] = await Promise.all([
+    fetchProfileMap([session.user.email]),
+    fetchLikedIds(data.map((e) => e.id), session.user.email),
+  ]);
   const myProfile = profileMap.get(session.user.email) ?? null;
 
   return data.map((entry) => ({
     ...entry,
     profiles: myProfile,
+    user_liked: likedIds.has(entry.id),
   }));
 }

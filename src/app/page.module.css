@@ -1,20 +1,36 @@
+/* ── 메인 래퍼 ───────────────────────────────────────── */
 .main {
   position: relative;
-  min-height: 100vh;
   width: 100%;
-  background-color: #020617;
-  color: #ffffff;
-  overflow: hidden;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
 }
 
-.marqueeBackground {
-  position: absolute;
+/* 대기감 있는 그라디언트 배경 */
+.main::before {
+  content: '';
+  position: fixed;
   inset: 0;
   z-index: 0;
-  opacity: 0.2;
   pointer-events: none;
+  background:
+    radial-gradient(ellipse 900px 700px at 15% 40%, rgba(0, 95, 154, 0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 600px 500px at 85% 15%, rgba(0, 95, 154, 0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 500px 600px at 60% 90%, rgba(0, 95, 154, 0.04) 0%, transparent 65%);
 }
 
+
+/* 플로팅 메시지 배경 */
+.floatingBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* ── 히어로 섹션 ─────────────────────────────────────── */
 .heroSection {
   position: relative;
   z-index: 10;
@@ -23,39 +39,86 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 0 1rem;
+  padding: 6rem 1.5rem 4rem;
   text-align: center;
+  gap: 0;
 }
 
+/* 에피타프 에이브로 */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.75rem;
+  opacity: 0.9;
+  animation: fadeIn 0.6s ease-out both;
+}
+
+/* 메인 타이틀 */
 .title {
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
-  font-weight: 700;
-  letter-spacing: -0.05em;
-  margin-bottom: 1rem;
-  animation: fadeIn 0.8s ease-out forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  font-family: 'Pretendard', sans-serif;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text-primary);
+  margin-bottom: 2.5rem;
+  animation: fadeIn 0.7s 0.1s ease-out both;
+}
+
+.titleLogo {
+  height: clamp(2.5rem, 8vw, 6rem);
+  width: auto;
+  object-fit: contain;
+  border-radius: 0.5rem;
 }
 
 .titleAccent {
-  color: #3b82f6;
+  color: var(--accent);
 }
 
+/* 카운트다운 */
 .countdownWrapper {
-  margin-bottom: 2rem;
-}
-
-.description {
-  max-width: 42rem;
-  font-size: clamp(1rem, 2.5vw, 1.25rem);
-  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
   margin-bottom: 2.5rem;
-  line-height: 1.75;
+  animation: fadeIn 0.7s 0.2s ease-out both;
 }
 
+.countdownLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* 설명 */
+.description {
+  max-width: 36rem;
+  font-size: clamp(0.9375rem, 2vw, 1.0625rem);
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+  line-height: 1.9;
+  animation: fadeIn 0.7s 0.3s ease-out both;
+}
+
+/* CTA 그룹 */
 .ctaGroup {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1rem;
   margin-bottom: 4rem;
+  animation: fadeIn 0.7s 0.4s ease-out both;
 }
 
 @media (min-width: 640px) {
@@ -65,27 +128,36 @@
 }
 
 .ctaButton {
-  padding: 1rem 2rem;
-  background-color: #2563eb;
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2.25rem;
+  background-color: var(--accent);
+  color: var(--accent-text);
   border-radius: 9999px;
   font-weight: 700;
+  font-size: 0.9375rem;
   text-decoration: none;
-  transition: background-color 0.2s;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+  letter-spacing: 0.02em;
+  transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 8px 28px -4px var(--accent-glow);
 }
 
 .ctaButton:hover {
-  background-color: #3b82f6;
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px -4px var(--accent-glow);
 }
 
+/* 하단 링크 */
 .footer {
   display: flex;
-  gap: 2rem;
-  font-size: 0.875rem;
-  color: #64748b;
-  border-top: 1px solid #1e293b;
+  gap: 2.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-faint);
+  border-top: 1px solid var(--border);
   padding-top: 2rem;
+  animation: fadeIn 0.7s 0.5s ease-out both;
 }
 
 .footerLink {
@@ -95,21 +167,38 @@
 }
 
 .footerLink:hover {
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
-/* ── 방명록 섹션 ── */
+/* ── 방명록 섹션 ─────────────────────────────────────── */
 .guestbookSection {
   position: relative;
   z-index: 10;
-  background-color: #020617;
-  padding: 5rem 1rem 6rem;
-  border-top: 1px solid #1e293b;
+  background-color: transparent;
+  border-top: 1px solid var(--border);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  /* 세로 중앙 정렬 */
+  justify-content: center;
+  padding: 5rem 1.5rem;
+}
+
+/* 방명록 섹션 상단 구분 장식 */
+.guestbookSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--accent), transparent);
 }
 
 .guestbookInner {
-  max-width: 42rem;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 44rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -117,13 +206,17 @@
 }
 
 .guestbookTitle {
-  font-size: 1.75rem;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 2.25rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
 }
 
 .guestbookSubtitle {
   font-size: 0.9rem;
-  color: #64748b;
-  margin-bottom: 1.5rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  letter-spacing: 0.01em;
 }

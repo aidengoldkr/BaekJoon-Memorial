@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createGuestbookEntry, addFlower } from "@/app/actions/guestbook";
+import { TierBadge, getTierLabel } from "@/components/TierBadge";
 import styles from "./GuestbookForm.module.css";
 
 interface GuestbookEntry {
@@ -103,36 +104,7 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
       </div>
 
       {/* 방명록 목록 — 항상 표시 */}
-      <ul className={styles.entries}>
-        {entries.map((entry) => (
-          <li key={entry.id} className={styles.entry}>
-            <div className={styles.entryBody}>
-              <div className={styles.entryMeta}>
-                <span className={styles.nickname}>
-                  {getProfile(entry.profiles)?.nickname ?? entry.email.split("@")[0]}
-                </span>
-                {getProfile(entry.profiles)?.tier && (
-                  <span>[{getProfile(entry.profiles)?.tier}]</span>
-                )}
-                <span>{new Date(entry.created_at).toLocaleDateString("ko-KR")}</span>
-              </div>
-              <p className={styles.entryContent}>{entry.content}</p>
-            </div>
-            <button
-              onClick={() => handleFlower(entry.id)}
-              className={styles.flowerBtn}
-              title="꽃 보내기"
-            >
-              🌸 <span>{entry.flower_count}</span>
-            </button>
-          </li>
-        ))}
-        {entries.length === 0 && (
-          <li className={styles.emptyMessage}>
-            아직 방명록이 없습니다. 첫 번째 메시지를 남겨보세요!
-          </li>
-        )}
-      </ul>
+
     </div>
   );
 }

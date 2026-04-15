@@ -1,9 +1,12 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import { redirect } from 'next/navigation';
 import { CountdownTimer } from '@/components/CountdownTimer';
-import { MessageMarquee } from '@/components/MessageMarquee';
+import { FloatingMessages } from '@/components/FloatingMessages';
 import { GuestbookForm } from '@/components/GuestbookForm';
 import { auth } from '@/lib/auth';
 import { getGuestbookEntries } from '@/app/actions/guestbook';
+import { getMyProfile } from '@/app/actions/profile';
 import styles from './page.module.css';
 
 export default async function LandingPage() {
@@ -12,28 +15,47 @@ export default async function LandingPage() {
     getGuestbookEntries(),
   ]);
 
+  // 최초 로그인: 프로필 미등록 → 마이페이지로 이동
+  if (session?.user?.email) {
+    const profile = await getMyProfile();
+    if (!profile) redirect('/mypage');
+  }
+
+  const floatingMessages = entries.length > 0
+    ? entries.map(e => e.content)
+    : undefined;
+
   return (
     <main className={styles.main}>
-      {/* 1. 배경: 방명록 마키 */}
-      <div className={styles.marqueeBackground}>
-        <MessageMarquee speed="slow" direction="left" />
-        <MessageMarquee speed="fast" direction="right" />
-        <MessageMarquee speed="normal" direction="left" />
+      {/* 1. 배경: 플로팅 메시지 */}
+      <div className={styles.floatingBackground}>
+        <FloatingMessages messages={floatingMessages} />
       </div>
 
       {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
+        <p className={styles.eyebrow}>2010 — 2026 · Baekjoon Online Judge</p>
+
         <h1 className={styles.title}>
-          Good Bye! <span className={styles.titleAccent}>BOJ!</span>
+          Good Bye!
+          <Image
+            src="/logo.webp"
+            alt="BOJ"
+            width={120}
+            height={120}
+            className={styles.titleLogo}
+            priority
+          />
         </h1>
 
         <div className={styles.countdownWrapper}>
+          <p className={styles.countdownLabel}>서비스 종료까지</p>
           <CountdownTimer targetDate="2026-04-28T00:00:00" />
         </div>
 
         <p className={styles.description}>
           16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
-          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 푸른 봄을 기록합니다.
+          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록합니다.
         </p>
 
         <div className={styles.ctaGroup}>
@@ -63,7 +85,7 @@ export default async function LandingPage() {
       {/* 3. 방명록 섹션 */}
       <section id="guestbook" className={styles.guestbookSection}>
         <div className={styles.guestbookInner}>
-          <h2 className={styles.guestbookTitle}>추모 방명록</h2>
+          <h2 className={styles.guestbookTitle}>방명록</h2>
           <p className={styles.guestbookSubtitle}>
             백준에게 마지막 한마디를 남겨주세요.
           </p>

@@ -1,0 +1,206 @@
+/* ── 카드 ── */
+.card {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 0.875rem;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+  border-left-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px -4px var(--shadow);
+}
+
+/* ── 본문 ── */
+.body {
+  flex: 1;
+  padding: 1.125rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.content {
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  margin: 0;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* ── 메타 ── */
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.authorWrapper {
+  position: relative;
+}
+
+.authorBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.authorBtn:hover {
+  color: var(--text-primary);
+}
+
+.authorName { line-height: 1; }
+
+.caret {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.date {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ── 좋아요 영역 ── */
+.likeArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0 1.125rem;
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
+  min-width: 56px;
+}
+
+.likeBtn {
+  font-size: 1.375rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  line-height: 1;
+  transition: transform 0.15s;
+}
+
+.likeBtn:hover:not(:disabled) {
+  transform: scale(1.25);
+}
+
+.likeBtn:disabled {
+  cursor: wait;
+}
+
+.likeBtnActive {
+  animation: heartPop 0.22s ease-out;
+}
+
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+.likeCount {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  min-width: 1.5rem;
+  text-align: center;
+  transition: color 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.likeCountActive {
+  color: var(--flower);
+}
+
+/* ── 프로필 팝업 ── */
+.popup {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 50;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-hover);
+  border-radius: 0.75rem;
+  padding: 1rem 1.125rem;
+  min-width: 180px;
+  box-shadow: 0 16px 40px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  animation: popupIn 0.15s ease-out both;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.popupHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.125rem;
+}
+
+.popupName {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.popupTier {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.popupStat {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.popupLangs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.125rem;
+}
+
+.popupLang {
+  font-size: 0.6875rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.4rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}

@@ -1,0 +1,154 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { TierBadge, getTierLabel } from "@/components/TierBadge";
+import { addFlower, removeFlower } from "@/app/actions/guestbook";
+import styles from "./GuestbookCard.module.css";
+
+interface Profile {
+  nickname: string | null;
+  tier: string | null;
+  solved_count: number | null;
+  top_languages: string[] | null;
+}
+
+export interface GuestbookEntry {
+  id: string;
+  email: string;
+  content: string;
+  flower_count: number;
+  created_at: string;
+  profiles?: Profile[] | Profile | null;
+}
+
+const STORAGE_KEY = "boj_liked_entries";
+
+function resolveProfile(profiles: GuestbookEntry["profiles"]): Profile | null {
+  if (!profiles) return null;
+  return Array.isArray(profiles) ? (profiles[0] ?? null) : profiles;
+}
+
+export function GuestbookCard({ entry }: { entry: GuestbookEntry }) {
+  const [likes, setLikes] = useState(entry.flower_count);
+  const [liked, setLiked] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const profile = resolveProfile(entry.profiles);
+  const displayName = profile?.nickname ?? entry.email.split("@")[0];
+
+  // localStorage에서 좋아요 여부 복원
+  useEffect(() => {
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+      setLiked(ids.includes(entry.id));
+    } catch {}
+  }, [entry.id]);
+
+  // 팝업 외부 클릭 닫기
+  useEffect(() => {
+    if (!popupOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setPopupOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [popupOpen]);
+
+  const handleLike = async () => {
+    if (pending) return;
+    setPending(true);
+
+    const wasLiked = liked;
+    // optimistic update
+    setLiked(!wasLiked);
+    setLikes((n) => n + (wasLiked ? -1 : 1));
+
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+      if (wasLiked) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.filter((i) => i !== entry.id)));
+        await removeFlower(entry.id);
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids, entry.id]));
+        await addFlower(entry.id);
+      }
+    } catch {
+      // 실패 시 롤백
+      setLiked(wasLiked);
+      setLikes((n) => n + (wasLiked ? 1 : -1));
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <article className={styles.card}>
+      {/* 본문 영역 */}
+      <div className={styles.body}>
+        <p className={styles.content}>{entry.content}</p>
+
+        <div className={styles.meta}>
+          <div className={styles.authorWrapper} ref={wrapperRef}>
+            <button
+              className={styles.authorBtn}
+              onClick={() => profile && setPopupOpen((v) => !v)}
+              style={{ cursor: profile ? "pointer" : "default" }}
+            >
+              <TierBadge tier={profile?.tier} size={15} />
+              <span className={styles.authorName}>{displayName}</span>
+              {profile && <span className={styles.caret}>▾</span>}
+            </button>
+
+            {popupOpen && profile && (
+              <div className={styles.popup}>
+                <div className={styles.popupHeader}>
+                  <TierBadge tier={profile.tier} size={30} />
+                  <div>
+                    <p className={styles.popupName}>{profile.nickname ?? displayName}</p>
+                    <p className={styles.popupTier}>{getTierLabel(profile.tier)}</p>
+                  </div>
+                </div>
+                {(profile.solved_count ?? 0) > 0 && (
+                  <p className={styles.popupStat}>
+                    {profile.solved_count!.toLocaleString()}문제 해결
+                  </p>
+                )}
+                {(profile.top_languages?.length ?? 0) > 0 && (
+                  <div className={styles.popupLangs}>
+                    {profile.top_languages!.map((l) => (
+                      <span key={l} className={styles.popupLang}>{l}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <span className={styles.date}>
+            {new Date(entry.created_at).toLocaleDateString("ko-KR")}
+          </span>
+        </div>
+      </div>
+
+      {/* 좋아요 영역 */}
+      <div className={styles.likeArea}>
+        <button
+          className={`${styles.likeBtn} ${liked ? styles.likeBtnActive : ""}`}
+          onClick={handleLike}
+          disabled={pending}
+          title={liked ? "좋아요 취소" : "좋아요"}
+          aria-label={liked ? "좋아요 취소" : "좋아요"}
+        >
+          {liked ? "❤️" : "🤍"}
+        </button>
+        <span className={`${styles.likeCount} ${liked ? styles.likeCountActive : ""}`}>
+          {likes}
+        </span>
+      </div>
+    </article>
+  );
+}

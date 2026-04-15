@@ -1,7 +1,7 @@
 .main {
   min-height: 100vh;
-  background-color: #020617;
-  color: #ffffff;
+  background-color: var(--bg);
+  color: var(--text-primary);
   padding: 4rem 1rem;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .email {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 0.875rem;
 }
 
@@ -45,16 +45,21 @@
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #cbd5e1;
+  color: var(--text-secondary);
+}
+
+.required {
+  color: var(--error);
+  font-size: 0.75rem;
 }
 
 .input {
   width: 100%;
-  background-color: #0f172a;
-  border: 1px solid #334155;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
   outline: none;
@@ -64,11 +69,27 @@
 }
 
 .input::placeholder {
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .input:focus {
-  border-color: #3b82f6;
+  border-color: var(--accent);
+}
+
+.tierSelectRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tierSelect {
+  flex: 1;
+}
+
+.tierHint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0;
 }
 
 .languageGrid {
@@ -81,22 +102,22 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #0f172a;
-  border: 1px solid #334155;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   font-size: 0.875rem;
-  color: #ffffff;
+  color: var(--text-primary);
   transition: border-color 0.2s;
 }
 
 .langOption:hover {
-  border-color: #3b82f6;
+  border-color: var(--accent);
 }
 
 .checkbox {
-  accent-color: #3b82f6;
+  accent-color: var(--accent);
   cursor: pointer;
 }
 
@@ -108,8 +129,8 @@
 
 .submitBtn {
   padding: 0.75rem 1.5rem;
-  background-color: #2563eb;
-  color: #ffffff;
+  background-color: var(--accent);
+  color: var(--accent-text);
   border: none;
   border-radius: 9999px;
   font-weight: 700;
@@ -120,13 +141,13 @@
 }
 
 .submitBtn:hover {
-  background-color: #3b82f6;
+  background-color: var(--accent-hover);
 }
 
 .backBtn {
   padding: 0.75rem 1.5rem;
-  background-color: #1e293b;
-  color: #ffffff;
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
   border-radius: 9999px;
   font-weight: 700;
   text-decoration: none;
@@ -135,5 +156,5 @@
 }
 
 .backBtn:hover {
-  background-color: #334155;
+  background-color: var(--border);
 }

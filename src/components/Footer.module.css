@@ -1,0 +1,98 @@
+.footer {
+  background-color: var(--bg);
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.inner {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 2.5rem;
+  display: flex;
+  gap: 5rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.brandName {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.brandDesc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 22rem;
+}
+
+.links {
+  display: flex;
+  gap: 3.5rem;
+  flex-wrap: wrap;
+}
+
+.linkGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.linkGroupTitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.25rem;
+}
+
+.link {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.link:hover {
+  color: var(--text-primary);
+}
+
+.bottom {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 1.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.disclaimer {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin: 0;
+  opacity: 0.6;
+}

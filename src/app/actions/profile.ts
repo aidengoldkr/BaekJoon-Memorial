@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 export interface ProfileFormData {
   nickname: string;
@@ -14,6 +14,10 @@ export async function upsertProfile(data: ProfileFormData) {
   const session = await auth();
   if (!session?.user?.email) {
     return { success: false, error: "로그인이 필요합니다." };
+  }
+
+  if (!data.nickname || !data.nickname.trim()) {
+    return { success: false, error: "닉네임을 입력해주세요." };
   }
 
   const supabase = createServiceClient();
@@ -35,6 +39,16 @@ export async function upsertProfile(data: ProfileFormData) {
   }
 
   return { success: true };
+}
+
+export async function getProfileByEmail(email: string) {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("nickname, tier, solved_count")
+    .eq("email", email)
+    .single();
+  return data as { nickname: string | null; tier: string | null; solved_count: number | null } | null;
 }
 
 export async function getMyProfile() {

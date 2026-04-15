@@ -1,9 +1,10 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getMyProfile, upsertProfile } from "@/app/actions/profile";
+import { normalizeTier } from "@/components/TierBadge";
+import { TierSelect } from "@/components/TierSelect";
 import styles from "./mypage.module.css";
 
-const TIERS = ["Unrated", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"];
 const LANGUAGES = ["C++", "Python", "Java", "C", "Kotlin", "JavaScript", "TypeScript", "Go", "Rust"];
 
 export default async function MyPage() {
@@ -11,6 +12,13 @@ export default async function MyPage() {
   if (!session?.user?.email) redirect("/login");
 
   const profile = await getMyProfile();
+
+  const currentTier = normalizeTier(profile?.tier);
+  // 저장된 닉네임 → 없으면 Google 이름 → 없으면 이메일 앞부분
+  const defaultNickname =
+    profile?.nickname ??
+    session.user.name ??
+    session.user.email.split("@")[0];
 
   return (
     <main className={styles.main}>
@@ -24,42 +32,34 @@ export default async function MyPage() {
           action={async (formData: FormData) => {
             "use server";
             const languages = formData.getAll("top_languages") as string[];
-            await upsertProfile({
+            const result = await upsertProfile({
               nickname: formData.get("nickname") as string,
               tier: formData.get("tier") as string,
               solved_count: Number(formData.get("solved_count")) || 0,
               top_languages: languages,
             });
-            redirect("/mypage");
+            if (result.success) redirect("/");
+            // 실패 시 그대로 (에러 표시는 추후 개선)
           }}
           className={styles.form}
         >
-          {/* 닉네임 */}
+          {/* 닉네임 (필수) */}
           <div className={styles.formGroup}>
-            <label className={styles.label}>닉네임</label>
+            <label className={styles.label}>
+              닉네임 <span className={styles.required}>*</span>
+            </label>
             <input
               name="nickname"
-              defaultValue={profile?.nickname ?? ""}
-              placeholder="사용할 닉네임을 입력하세요"
+              defaultValue={defaultNickname}
+              placeholder="닉네임을 입력해주세요"
+              required
+              maxLength={30}
               className={styles.input}
             />
           </div>
 
-          {/* 티어 */}
-          <div className={styles.formGroup}>
-            <label className={styles.label}>solved.ac 티어</label>
-            <select
-              name="tier"
-              defaultValue={profile?.tier ?? "Unrated"}
-              className={styles.input}
-            >
-              {TIERS.map((tier) => (
-                <option key={tier} value={tier}>
-                  {tier}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* 티어 + 레벨 */}
+          <TierSelect defaultValue={currentTier} />
 
           {/* 풀어본 문제 수 */}
           <div className={styles.formGroup}>
@@ -77,21 +77,18 @@ export default async function MyPage() {
           <div className={styles.formGroup}>
             <label className={styles.label}>주력 언어</label>
             <div className={styles.languageGrid}>
-              {LANGUAGES.map((lang) => {
-                const checked = profile?.top_languages?.includes(lang) ?? false;
-                return (
-                  <label key={lang} className={styles.langOption}>
-                    <input
-                      type="checkbox"
-                      name="top_languages"
-                      value={lang}
-                      defaultChecked={checked}
-                      className={styles.checkbox}
-                    />
-                    {lang}
-                  </label>
-                );
-              })}
+              {LANGUAGES.map((lang) => (
+                <label key={lang} className={styles.langOption}>
+                  <input
+                    type="checkbox"
+                    name="top_languages"
+                    value={lang}
+                    defaultChecked={profile?.top_languages?.includes(lang) ?? false}
+                    className={styles.checkbox}
+                  />
+                  {lang}
+                </label>
+              ))}
             </div>
           </div>
 

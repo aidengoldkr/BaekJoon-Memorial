@@ -150,6 +150,10 @@ export async function getGuestbookPage(
 
 // ── 좋아요 추가 ────────────────────────────────────────────────────────
 export async function addFlower(id: string) {
+  const session = await auth();
+  if (!session?.user?.email)
+    return { success: false, error: "로그인이 필요합니다." };
+
   const supabase = createServiceClient();
 
   const { error } = await supabase.rpc("increment_flower_count", { row_id: id });
@@ -174,6 +178,10 @@ export async function addFlower(id: string) {
 
 // ── 좋아요 취소 ────────────────────────────────────────────────────────
 export async function removeFlower(id: string) {
+  const session = await auth();
+  if (!session?.user?.email)
+    return { success: false, error: "로그인이 필요합니다." };
+
   const supabase = createServiceClient();
 
   const { data: entry } = await supabase

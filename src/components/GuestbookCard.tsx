@@ -66,6 +66,10 @@ export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEnt
   }, [popupOpen]);
 
   const handleLike = async () => {
+    if (!currentUserEmail) {
+      alert("로그인이 필요한 기능입니다.");
+      return;
+    }
     if (pending) return;
     setPending(true);
 
@@ -76,12 +80,18 @@ export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEnt
 
     try {
       const ids: string[] = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+      let result;
       if (wasLiked) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.filter((i) => i !== entry.id)));
-        await removeFlower(entry.id);
+        result = await removeFlower(entry.id);
       } else {
         localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids, entry.id]));
-        await addFlower(entry.id);
+        result = await addFlower(entry.id);
+      }
+
+      if (result && !result.success) {
+        alert(result.error);
+        throw new Error(result.error);
       }
     } catch {
       // 실패 시 롤백

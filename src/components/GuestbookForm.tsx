@@ -51,6 +51,10 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
   };
 
   const handleFlower = (id: string) => {
+    if (!userEmail) {
+      alert("로그인이 필요한 기능입니다.");
+      return;
+    }
     startTransition(async () => {
       await addFlower(id);
       setEntries((prev) =>

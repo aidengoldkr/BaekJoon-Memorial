@@ -1,0 +1,17 @@
+.wrapper {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.track {
+  display: inline-flex;
+  gap: 3rem;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+}
+
+.message {
+  flex-shrink: 0;
+  padding: 0 1rem;
+}

@@ -1,0 +1,139 @@
+.main {
+  min-height: 100vh;
+  background-color: #020617;
+  color: #ffffff;
+  padding: 4rem 1rem;
+}
+
+.container {
+  max-width: 32rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.email {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+.input {
+  width: 100%;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  appearance: none;
+}
+
+.input::placeholder {
+  color: #64748b;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+}
+
+.languageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.langOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.langOption:hover {
+  border-color: #3b82f6;
+}
+
+.checkbox {
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.submitBtn {
+  padding: 0.75rem 1.5rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.submitBtn:hover {
+  background-color: #3b82f6;
+}
+
+.backBtn {
+  padding: 0.75rem 1.5rem;
+  background-color: #1e293b;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+}
+
+.backBtn:hover {
+  background-color: #334155;
+}

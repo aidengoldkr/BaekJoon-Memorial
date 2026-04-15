@@ -2,85 +2,106 @@
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');
-  font-weight: 100; font-display: swap;
+  font-weight: 100;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');
-  font-weight: 200; font-display: swap;
+  font-weight: 200;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2');
-  font-weight: 300; font-display: swap;
+  font-weight: 300;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');
-  font-weight: 400; font-display: swap;
+  font-weight: 400;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
-  font-weight: 500; font-display: swap;
+  font-weight: 500;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');
-  font-weight: 600; font-display: swap;
+  font-weight: 600;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2');
-  font-weight: 700; font-display: swap;
+  font-weight: 700;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2') format('woff2');
-  font-weight: 800; font-display: swap;
+  font-weight: 800;
+  font-display: swap;
 }
+
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');
-  font-weight: 900; font-display: swap;
+  font-weight: 900;
+  font-display: swap;
 }
 
 /* ── 공통 토큰 (테마 무관) ───────────────────────────── */
 :root {
-  --accent:       #005F9A;
+  --accent: #005F9A;
   --accent-hover: #0070B5;
-  --accent-text:  #F2F2F2;
-  --accent-glow:  rgba(0, 95, 154, 0.22);
+  --accent-text: #F2F2F2;
+  --accent-glow: rgba(0, 95, 154, 0.22);
+  --accent-bg: #DDE8EF;
+  --accent-border: #707e88;
 
-  --error:        #E05252;
-  --error-bg:     rgba(224, 82, 82, 0.1);
-  --danger:       #E05252;
+  --error: #E05252;
+  --error-bg: rgba(224, 82, 82, 0.1);
+  --danger: #E05252;
 
-  --flower:       #F9A8D4;
+  --flower: #F9A8D4;
 }
 
 /* ── 테마 ────────────────────────────────────────────── */
 :root {
   color-scheme: light;
 
-  --bg:           #F2F2F2;
-  --bg-card:      #FFFFFF;
-  --bg-elevated:  #E8E8E8;
-  --bg-overlay:   rgba(242, 242, 242, 0.88);
+  --bg: #F3F6F8;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #E8E8E8;
+  --bg-overlay: rgba(242, 242, 242, 0.88);
 
-  --border:       #D8D8D8;
+  --border: #D8D8D8;
   --border-hover: #B0B0B0;
 
-  --text-primary:   #3C3C3C;
+  --text-primary: #3C3C3C;
   --text-secondary: #6B6B6B;
-  --text-muted:     #8A8A8A;
-  --text-faint:     #AAAAAA;
+  --text-muted: #8A8A8A;
+  --text-faint: #AAAAAA;
 
   --shadow: rgba(0, 0, 0, 0.1);
 }
 
 /* ── 리셋 ────────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
@@ -90,7 +111,20 @@ html {
   scroll-behavior: smooth;
 }
 
-html, body {
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+html,
+body {
   max-width: 100vw;
   overflow-x: hidden;
 }
@@ -104,6 +138,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.25s, color 0.25s;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 a {
@@ -112,6 +148,13 @@ a {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

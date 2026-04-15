@@ -21,15 +21,12 @@ export default async function LandingPage() {
     if (!profile) redirect('/mypage');
   }
 
-  const floatingMessages = entries.length > 0
-    ? entries.map(e => e.content)
-    : undefined;
 
   return (
     <main className={styles.main}>
       {/* 1. 배경: 플로팅 메시지 */}
       <div className={styles.floatingBackground}>
-        <FloatingMessages messages={floatingMessages} />
+        <FloatingMessages entries={entries} />
       </div>
 
       {/* 2. 히어로 섹션 */}
@@ -54,12 +51,12 @@ export default async function LandingPage() {
 
         <p className={styles.description}>
           16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
-          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록합니다.
+          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록하며.
         </p>
         <div className={styles.guestbookInner}>
           <h2 className={styles.guestbookTitle}>방명록</h2>
           <p className={styles.guestbookSubtitle}>
-            백준에게 마지막 한마디를 남겨주세요.
+            백준을 추억하며 마지막 한마디를 남겨주세요.
           </p>
           <GuestbookForm
             initialEntries={entries}

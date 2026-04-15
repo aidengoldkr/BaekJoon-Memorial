@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { getGuestbookPage } from "@/app/actions/guestbook";
 import { GuestbookCard, type GuestbookEntry } from "@/components/GuestbookCard";
 
@@ -11,14 +11,15 @@ interface Props {
   page: number;
   sort: "latest" | "likes";
   pageSize: number;
+  currentUserEmail?: string | null;
 }
 
-const listVariants = {
+const listVariants: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.06 } },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   show:   { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
 };
@@ -29,11 +30,12 @@ export function GuestbookListClient({
   page,
   sort,
   pageSize,
+  currentUserEmail,
 }: Props) {
   const { data, isFetching } = useQuery({
     queryKey: ["guestbook", page, sort],
     queryFn:  () => getGuestbookPage(page, pageSize, sort),
-    initialData: { entries: initialEntries, total: initialTotal },
+    initialData: { entries: initialEntries as any, total: initialTotal },
     placeholderData: (prev) => prev,
   });
 
@@ -64,7 +66,7 @@ export function GuestbookListClient({
         >
           {entries.map((entry) => (
             <motion.div key={entry.id} variants={cardVariants}>
-              <GuestbookCard entry={entry} />
+              <GuestbookCard entry={entry} currentUserEmail={currentUserEmail} />
             </motion.div>
           ))}
 

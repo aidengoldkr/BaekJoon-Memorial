@@ -4,33 +4,30 @@
   right: 1.25rem;
   z-index: 100;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0.625rem 0.75rem;
-  background: var(--bg-overlay);
-  border: 1px solid var(--border);
-  border-radius: 0.625rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 2rem;
   cursor: pointer;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: border-color 0.2s, background 0.2s;
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 .hamburger:hover {
-  border-color: var(--border-hover);
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-.hamburger span {
-  display: block;
-  width: 20px;
-  height: 1.5px;
-  background: var(--text-secondary);
-  border-radius: 2px;
-  transition: background 0.2s;
-}
-
-.hamburger:hover span {
-  background: var(--text-primary);
+.hamburger:active {
+  transform: translateY(0);
 }
 
 .backdrop {
@@ -171,7 +168,9 @@
   text-align: center;
 }
 
-.spacer { flex: 1; }
+.spacer {
+  flex: 1;
+}
 
 /* 테마 토글 */
 .themeToggle {
@@ -224,4 +223,11 @@
 .logoutBtn:hover {
   border-color: var(--danger);
   color: var(--danger);
+}
+
+@media (max-width: 480px) {
+  .drawer {
+    width: 85vw;
+    padding: 1.25rem;
+  }
 }

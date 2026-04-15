@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { TierBadge, getTierLabel } from "@/components/TierBadge";
-import { addFlower, removeFlower } from "@/app/actions/guestbook";
+import { addFlower, removeFlower, updateGuestbookEntry, deleteGuestbookEntry } from "@/app/actions/guestbook";
 import styles from "./GuestbookCard.module.css";
 
 interface Profile {
@@ -28,11 +29,17 @@ function resolveProfile(profiles: GuestbookEntry["profiles"]): Profile | null {
   return Array.isArray(profiles) ? (profiles[0] ?? null) : profiles;
 }
 
-export function GuestbookCard({ entry }: { entry: GuestbookEntry }) {
+export function GuestbookCard({ entry, currentUserEmail }: { entry: GuestbookEntry; currentUserEmail?: string | null }) {
   const [likes, setLikes] = useState(entry.flower_count);
   const [liked, setLiked] = useState(false);
   const [pending, setPending] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(entry.content);
+  const [isPendingTrans, startTransition] = useTransition();
+  const router = useRouter();
+
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const profile = resolveProfile(entry.profiles);
@@ -85,11 +92,64 @@ export function GuestbookCard({ entry }: { entry: GuestbookEntry }) {
     }
   };
 
+  const handleUpdate = () => {
+    if (editContent.trim().length === 0) return;
+    startTransition(async () => {
+      const result = await updateGuestbookEntry(entry.id, editContent);
+      if (result.success) {
+        setIsEditing(false);
+        window.location.reload();
+      } else {
+        alert(result.error);
+      }
+    });
+  };
+
+  const handleDelete = () => {
+    if (!window.confirm("정말로 삭제하시겠습니까? (이 작업은 되돌릴 수 없습니다.)")) return;
+    startTransition(async () => {
+      const result = await deleteGuestbookEntry(entry.id);
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert(result.error);
+      }
+    });
+  };
+
+  const isOwner = currentUserEmail === entry.email;
+
   return (
     <article className={styles.card}>
       {/* 본문 영역 */}
       <div className={styles.body}>
-        <p className={styles.content}>{entry.content}</p>
+        {isEditing ? (
+          <div className={styles.editArea}>
+            <textarea
+              className={styles.editTextarea}
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value.slice(0, 140))}
+              disabled={isPendingTrans}
+            />
+            <div className={styles.editActions}>
+              <span className={styles.editCount}>{editContent.length}/140</span>
+              <div className={styles.editBtns}>
+                <button 
+                  className={styles.cancelBtn} 
+                  onClick={() => { setIsEditing(false); setEditContent(entry.content); }}
+                  disabled={isPendingTrans}
+                >취소</button>
+                <button 
+                  className={styles.saveBtn} 
+                  onClick={handleUpdate}
+                  disabled={isPendingTrans || editContent.trim().length === 0}
+                >저장</button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className={styles.content}>{entry.content}</p>
+        )}
 
         <div className={styles.meta}>
           <div className={styles.authorWrapper} ref={wrapperRef}>
@@ -128,9 +188,17 @@ export function GuestbookCard({ entry }: { entry: GuestbookEntry }) {
             )}
           </div>
 
-          <span className={styles.date}>
-            {new Date(entry.created_at).toLocaleDateString("ko-KR")}
-          </span>
+          <div className={styles.metaRight}>
+            {isOwner && !isEditing && (
+              <div className={styles.ownerActions}>
+                <button className={styles.actionBtn} onClick={() => setIsEditing(true)}>수정</button>
+                <button className={styles.actionBtn} onClick={handleDelete}>삭제</button>
+              </div>
+            )}
+            <span className={styles.date}>
+              {new Date(entry.created_at).toLocaleDateString("ko-KR")}
+            </span>
+          </div>
         </div>
       </div>
 

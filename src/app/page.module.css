@@ -39,7 +39,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 6rem 1.5rem 4rem;
+  padding: 4rem 1.5rem 4rem;
   text-align: center;
   gap: 0;
 }
@@ -62,10 +62,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+
   font-family: 'Pretendard', sans-serif;
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 200;
   letter-spacing: -0.01em;
   line-height: 1.1;
   color: var(--text-primary);
@@ -106,7 +106,7 @@
 .description {
   max-width: 36rem;
   font-size: clamp(0.9375rem, 2vw, 1.0625rem);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   margin-bottom: 3rem;
   line-height: 1.9;
   animation: fadeIn 0.7s 0.3s ease-out both;
@@ -220,4 +220,42 @@
   color: var(--text-muted);
   margin-bottom: 2rem;
   letter-spacing: 0.01em;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 28px;
+  }
+
+  .titleLogo {
+    height: 60px;
+  }
+
+  .description {
+    font-size: 0.875rem;
+  }
+
+  .ctaButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .guestbookTitle {
+    font-size: 1.75rem;
+  }
+
+  .guestbookSubtitle {
+    font-size: 0.8125rem;
+  }
+
+  .heroSection,
+  .guestbookSection {
+    padding: 3rem 1.5rem;
+  }
+
+  .countdownWrapper {
+    transform: scale(0.7);
+    transform-origin: top center;
+    margin-bottom: 0;
+  }
 }

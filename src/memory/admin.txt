@@ -1,0 +1,100 @@
+
+type Role = "super_admin" | "admin" | "user";
+
+type Permission =
+  | "dashboard.view"
+  | "users.create"
+  | "users.update"
+  | "users.delete"
+  | "roles.manage"
+  | "settings.manage"
+  | "logs.view"
+  | "profile.view"
+  | "profile.update"
+  | "order.create"
+  | "order.view"
+  | "order.cancel";
+
+type AdminRecord = {
+  id: string;
+  name: string;
+  role: Role;
+  email: string;
+  passwordHash: string;
+  memo?: string;
+};
+
+const admins: AdminRecord[] = [
+  {
+    id: "admin_001",
+    name: "aidengoldkr",
+    role: "admin",
+    email: "",
+    passwordHash: "X",
+    memo: "건우",
+  },
+  {
+    id: "admin_002",
+    name: "Rupital",
+    role: "admin",
+    email: "",
+    passwordHash: "X",
+    memo: "창용",
+  },
+];
+
+const ADMIN_ONLY_PERMISSIONS: Permission[] = [
+  "dashboard.view",
+  "users.create",
+  "users.update",
+  "users.delete",
+  "roles.manage",
+  "settings.manage",
+  "logs.view",
+];
+
+const USER_PERMISSIONS: Permission[] = [
+  "profile.view",
+  "profile.update",
+  "order.create",
+  "order.view",
+  "order.cancel",
+];
+
+const ROLE_POLICY: Record<Role, Permission[] | "all"> = {
+  super_admin: "all",
+  admin: ["dashboard.view", "users.update", "logs.view"],
+  user: ["profile.view", "profile.update", "order.create", "order.view"],
+};
+
+function getPermissionsByRole(role: Role): Permission[] {
+  const policy = ROLE_POLICY[role];
+  if (policy === "all") {
+    return [...new Set([...ADMIN_ONLY_PERMISSIONS, ...USER_PERMISSIONS])];
+  }
+  return policy;
+}
+
+function hasPermission(role: Role, permission: Permission): boolean {
+  return getPermissionsByRole(role).includes(permission);
+}
+
+function canAccessAdminPage(role: Role): boolean {
+  return role === "super_admin" || role === "admin";
+}
+
+function getAdminById(id: string): AdminRecord | undefined {
+  return admins.find((admin) => admin.id === id);
+}
+
+export {
+  admins,
+  ADMIN_ONLY_PERMISSIONS,
+  USER_PERMISSIONS,
+  ROLE_POLICY,
+  getPermissionsByRole,
+  hasPermission,
+  canAccessAdminPage,
+  getAdminById,
+};
+

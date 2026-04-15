@@ -1,0 +1,129 @@
+
+export function optimizeSiteRuntime() {
+  setupPassiveEvents();
+  setupLazyImages();
+  setupSmartPrefetch();
+  setupAdaptiveAnimations();
+  setupLongTaskMonitor();
+}
+
+
+function setupPassiveEvents() {
+  const passiveOptions = { passive: true };
+  window.addEventListener('scroll', onScrollLight, passiveOptions);
+  window.addEventListener('touchstart', () => {}, passiveOptions);
+  window.addEventListener('touchmove', () => {}, passiveOptions);
+}
+
+let scheduled = false;
+function onScrollLight() {
+  if (scheduled) return;
+  scheduled = true;
+  requestAnimationFrame(() => {
+    // 필요한 최소 로직만 수행 (예: 헤더 그림자 토글)
+    const header = document.querySelector('header');
+    if (header) {
+      if (window.scrollY > 8) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    }
+    scheduled = false;
+  });
+}
+
+
+function setupLazyImages() {
+  const images = Array.from(document.querySelectorAll('img.js-lazy[data-src]'));
+  if (!images.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries, io) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const img = entry.target;
+        const nextSrc = img.getAttribute('data-src');
+        if (nextSrc) {
+          img.setAttribute('src', nextSrc);
+          img.removeAttribute('data-src');
+        }
+        io.unobserve(img);
+      }
+    },
+    { rootMargin: '200px 0px', threshold: 0.01 }
+  );
+
+  images.forEach((img) => observer.observe(img));
+}
+
+function setupSmartPrefetch() {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const isSlowNetwork =
+    !!connection &&
+    (connection.saveData || ['slow-2g', '2g'].includes(connection.effectiveType));
+
+  if (isSlowNetwork) return;
+
+  const links = Array.from(document.querySelectorAll('a[data-prefetch="intent"]'));
+  for (const link of links) {
+    link.addEventListener(
+      'mouseenter',
+      () => {
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#')) return;
+        prefetchDocument(href);
+      },
+      { passive: true, once: true }
+    );
+  }
+
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 700));
+  idle(() => {
+    const firstImportant = document.querySelector('a[data-prefetch="important"]');
+    const href = firstImportant?.getAttribute('href');
+    if (href) prefetchDocument(href);
+  });
+}
+
+function prefetchDocument(href) {
+  if (document.head.querySelector(`link[rel="prefetch"][href="${href}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'prefetch';
+  link.as = 'document';
+  link.href = href;
+  document.head.appendChild(link);
+}
+
+
+function setupAdaptiveAnimations() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    document.documentElement.classList.add('reduced-motion');
+    return;
+  }
+
+  const deviceMemory = navigator.deviceMemory || 4;
+  const hardwareConcurrency = navigator.hardwareConcurrency || 4;
+  const lowSpec = deviceMemory <= 2 || hardwareConcurrency <= 2;
+
+  if (lowSpec) {
+    document.documentElement.classList.add('lite-animations');
+  } else {
+    document.documentElement.classList.add('full-animations');
+  }
+}
+
+
+function setupLongTaskMonitor() {
+  if (!('PerformanceObserver' in window)) return;
+
+  try {
+    const observer = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        // 운영에서는 analytics/log 전송 권장
+        console.warn('[perf] long task detected:', Math.round(entry.duration), 'ms');
+      }
+    });
+    observer.observe({ type: 'longtask', buffered: true });
+  } catch {
+
+  }
+}

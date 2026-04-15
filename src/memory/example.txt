@@ -1,0 +1,68 @@
+
+// 모바일 페이지 자동화 + 로딩 최적화 예시 (Playwright)
+// 실행 전: npm i -D playwright
+// 실행: npx playwright test mobile-optimized.spec.ts
+
+import { test, expect, devices } from '@playwright/test';
+
+test.use({
+  ...devices['iPhone 13'],
+  locale: 'ko-KR',
+  timezoneId: 'Asia/Seoul',
+  viewport: { width: 390, height: 844 },
+});
+
+test('모바일 페이지 자동화 및 최적화', async ({ page }) => {
+  // 성능 최적화: 무거운 리소스(광고/추적/대용량 이미지) 차단
+  await page.route('**/*', (route) => {
+    const request = route.request();
+    const url = request.url();
+    const type = request.resourceType();
+
+    const shouldBlock =
+      type === 'media' ||
+      url.includes('doubleclick') ||
+      url.includes('google-analytics') ||
+      url.includes('tracker') ||
+      url.includes('banner');
+
+    if (shouldBlock) return route.abort();
+    return route.continue();
+  });
+
+  // 페이지 로딩 시간 측정
+  const start = Date.now();
+  await page.goto('https://example.com', {
+    waitUntil: 'domcontentloaded',
+    timeout: 30000,
+  });
+  const loadMs = Date.now() - start;
+  console.log(`모바일 초기 로딩 시간: ${loadMs}ms`);
+
+  // 모바일 자동화 동작
+  await page.locator('button:has-text("메뉴")').first().click({ timeout: 5000 }).catch(() => {});
+  await page.locator('input[type="search"]').first().fill('good buy');
+  await page.keyboard.press('Enter');
+
+  // 핵심 요소 확인
+  await expect(page.locator('body')).toBeVisible();
+
+  // 스크롤 자동화 + 지연 로딩 컨텐츠 렌더 유도
+  for (let i = 0; i < 3; i++) {
+    await page.mouse.wheel(0, 1200);
+    await page.waitForTimeout(400);
+  }
+
+  // 성능 메트릭 수집
+  const perf = await page.evaluate(() => {
+    const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    return {
+      domContentLoaded: Math.round(nav.domContentLoadedEventEnd),
+      loadEventEnd: Math.round(nav.loadEventEnd),
+      transferSize: nav.transferSize,
+      encodedBodySize: nav.encodedBodySize,
+    };
+  });
+
+  console.log('성능 메트릭:', perf);
+});

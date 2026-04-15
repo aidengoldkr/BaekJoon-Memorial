@@ -47,7 +47,7 @@ export function Footer() {
 
       {/* 하단 바 */}
       <div className={styles.bottom}>
-        <p className={styles.copyright}>© 2026 Good Bye! BOJ! — 팬 메이드 추모 프로젝트</p>
+        <p className={styles.copyright}>© 2026 Made by Aidengoldkr With Rupital</p>
         <p className={styles.disclaimer}>백준 온라인 저지의 공식 서비스가 아닙니다.</p>
       </div>
     </footer>

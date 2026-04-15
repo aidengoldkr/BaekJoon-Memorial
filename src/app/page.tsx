@@ -34,15 +34,14 @@ export default async function LandingPage() {
 
       {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
-        <p className={styles.eyebrow}>2010 — 2026 · Baekjoon Online Judge</p>
 
         <h1 className={styles.title}>
           Good Bye!
           <Image
-            src="/logo.webp"
+            src="/asset/logo.png"
             alt="BOJ"
-            width={120}
-            height={120}
+            width={240}
+            height={240}
             className={styles.titleLogo}
             priority
           />
@@ -57,11 +56,15 @@ export default async function LandingPage() {
           16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
           수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록합니다.
         </p>
-
-        <div className={styles.ctaGroup}>
-          <Link href="#guestbook" className={styles.ctaButton}>
-            방명록 남기기 ↓
-          </Link>
+        <div className={styles.guestbookInner}>
+          <h2 className={styles.guestbookTitle}>방명록</h2>
+          <p className={styles.guestbookSubtitle}>
+            백준에게 마지막 한마디를 남겨주세요.
+          </p>
+          <GuestbookForm
+            initialEntries={entries}
+            userEmail={session?.user?.email ?? null}
+          />
         </div>
 
         <div className={styles.footer}>
@@ -79,20 +82,6 @@ export default async function LandingPage() {
           >
             solved.ac 공식 문서
           </a>
-        </div>
-      </section>
-
-      {/* 3. 방명록 섹션 */}
-      <section id="guestbook" className={styles.guestbookSection}>
-        <div className={styles.guestbookInner}>
-          <h2 className={styles.guestbookTitle}>방명록</h2>
-          <p className={styles.guestbookSubtitle}>
-            백준에게 마지막 한마디를 남겨주세요.
-          </p>
-          <GuestbookForm
-            initialEntries={entries}
-            userEmail={session?.user?.email ?? null}
-          />
         </div>
       </section>
     </main>

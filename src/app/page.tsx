@@ -15,6 +15,8 @@ export default async function LandingPage() {
     getGuestbookEntries(),
   ]);
 
+
+
   // 최초 로그인: 프로필 미등록 → 마이페이지로 이동
   if (session?.user?.email) {
     const profile = await getMyProfile();
@@ -54,10 +56,12 @@ export default async function LandingPage() {
           수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록하며.
         </p>
         <div className={styles.guestbookInner}>
-          <h2 className={styles.guestbookTitle}>방명록</h2>
-          <p className={styles.guestbookSubtitle}>
-            백준을 추억하며 마지막 한마디를 남겨주세요.
-          </p>
+          <div className={styles.guestbookHeader}>
+            <h2 className={styles.guestbookTitle}>방명록</h2>
+            <p className={styles.guestbookSubtitle}>
+              지금까지 {entries.length.toLocaleString()}개의 방명록이 남겨졌어요!
+            </p>
+          </div>
           <GuestbookForm
             initialEntries={entries}
             userEmail={session?.user?.email ?? null}

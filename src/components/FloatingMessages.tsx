@@ -39,14 +39,17 @@ interface Props {
 
 export function FloatingMessages({ entries }: Props) {
   const src = useMemo(() => {
-    if (!entries || entries.length === 0) return FALLBACK_MESSAGES;
+    // 50자 넘는 메시지 제외
+    const validEntries = (entries || []).filter(e => e.content.length <= 50);
 
-    if (entries.length < 10) {
+    if (validEntries.length === 0) return FALLBACK_MESSAGES;
+
+    if (validEntries.length < 10) {
       // 10개 미만: 실제 메시지 + FALLBACK 믹스
-      return [...entries.map(e => e.content), ...FALLBACK_MESSAGES];
+      return [...validEntries.map(e => e.content), ...FALLBACK_MESSAGES];
     } else {
       // 10개 이상: 좋아요(flower_count) 높은 순으로 정렬
-      return [...entries]
+      return [...validEntries]
         .sort((a, b) => b.flower_count - a.flower_count)
         .map(e => e.content);
     }

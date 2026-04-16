@@ -30,3 +30,10 @@
     transform: translateY(-50%) translateX(calc(-100% - 20px));
   }
 }
+
+@media (max-width: 768px) {
+  .comment {
+    opacity: 0.45;
+    font-size: 0.75rem;
+  }
+}

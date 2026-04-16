@@ -27,7 +27,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.65;
 }
 
 /* ── 히어로 섹션 ─────────────────────────────────────── */
@@ -107,9 +107,17 @@
   max-width: 36rem;
   font-size: clamp(0.9375rem, 2vw, 1.0625rem);
   color: var(--text-primary);
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   line-height: 1.9;
   animation: fadeIn 0.7s 0.3s ease-out both;
+
+  /* 뒷배경 블러 처리: 평소에는 거의 안 보이다가 요소가 지나갈 때만 느껴지도록 조절 */
+  padding: 0.5rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* CTA 그룹 */
@@ -206,20 +214,27 @@
   gap: 0.5rem;
 }
 
+
 .guestbookTitle {
   font-family: 'Pretendard', sans-serif;
-  font-size: 2.25rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 500;
   color: var(--text-primary);
-  margin-bottom: 0.25rem;
   letter-spacing: -0.02em;
 }
 
 .guestbookSubtitle {
   font-size: 0.9rem;
   color: var(--text-muted);
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   letter-spacing: 0.01em;
+
+  padding: 0.5rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 @media (max-width: 768px) {

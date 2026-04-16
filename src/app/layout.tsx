@@ -8,7 +8,7 @@ import { QueryProvider } from "@/components/QueryProvider";
 
 export const metadata: Metadata = {
   // 메타데이터 기준 URL (OG 이미지 등의 상대 경로를 절대 경로로 변환하는 데 필수)
-  metadataBase: new URL("https://your-production-domain.com"),
+  metadataBase: new URL("https://goodbye-boj.com"),
 
   title: {
     default: "Good Bye! BOJ! - 백준 메모리얼",

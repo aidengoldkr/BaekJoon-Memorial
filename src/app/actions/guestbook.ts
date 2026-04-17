@@ -77,14 +77,19 @@ export async function createGuestbookEntry(content: string) {
 }
 
 // ── 최근 방명록 조회 (메인 페이지 마키·폼 용) ─────────────────────────
-export async function getGuestbookEntries(limit = 100) {
+export async function getGuestbookEntries(limit?: number) {
   const supabase = createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("guestbooks")
     .select("id, email, content, flower_count, created_at")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .order("created_at", { ascending: false });
+
+  if (typeof limit === "number") {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
 
   if (error || !data) return [];
 

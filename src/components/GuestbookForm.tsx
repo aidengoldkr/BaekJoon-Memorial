@@ -51,6 +51,10 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
   };
 
   const handleFlower = (id: string) => {
+    if (!userEmail) {
+      alert("로그인이 필요한 기능입니다.");
+      return;
+    }
     startTransition(async () => {
       await addFlower(id);
       setEntries((prev) =>
@@ -71,8 +75,8 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
               ref={textareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value.slice(0, MAX_LENGTH))}
-              placeholder="백준에게 마지막 한마디를 남겨주세요..."
-              rows={3}
+              placeholder="백준을 추억하며 마지막 한마디를 남겨주세요..."
+              rows={2}
               className={styles.textarea}
               disabled={!userEmail}
             />

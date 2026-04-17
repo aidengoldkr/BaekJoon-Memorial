@@ -9,6 +9,9 @@ import { getGuestbookEntries } from '@/app/actions/guestbook';
 import { getMyProfile } from '@/app/actions/profile';
 import styles from './page.module.css';
 
+// ✅ 추가: 메인 페이지 강제 동적 렌더링 (캐시 무효화)
+export const dynamic = 'force-dynamic';
+
 export default async function LandingPage() {
   const [session, entries] = await Promise.all([
     auth(),
@@ -21,20 +24,15 @@ export default async function LandingPage() {
     if (!profile) redirect('/mypage');
   }
 
-  const floatingMessages = entries.length > 0
-    ? entries.map(e => e.content)
-    : undefined;
-
   return (
     <main className={styles.main}>
       {/* 1. 배경: 플로팅 메시지 */}
       <div className={styles.floatingBackground}>
-        <FloatingMessages messages={floatingMessages} />
+        <FloatingMessages entries={entries} />
       </div>
 
       {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
-
         <h1 className={styles.title}>
           Good Bye!
           <Image
@@ -54,13 +52,16 @@ export default async function LandingPage() {
 
         <p className={styles.description}>
           16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
-          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록합니다.
+          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록하며.
         </p>
+        
         <div className={styles.guestbookInner}>
-          <h2 className={styles.guestbookTitle}>방명록</h2>
-          <p className={styles.guestbookSubtitle}>
-            백준에게 마지막 한마디를 남겨주세요.
-          </p>
+          <div className={styles.guestbookHeader}>
+            <h2 className={styles.guestbookTitle}>방명록</h2>
+            <p className={styles.guestbookSubtitle}>
+              지금까지 {entries.length.toLocaleString()}개의 방명록이 남겨졌어요!
+            </p>
+          </div>
           <GuestbookForm
             initialEntries={entries}
             userEmail={session?.user?.email ?? null}

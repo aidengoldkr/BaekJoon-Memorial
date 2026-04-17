@@ -158,3 +158,78 @@
 .backBtn:hover {
   background-color: var(--border);
 }
+
+.expandBtn {
+  width: 100%;
+  padding: 0.625rem;
+  margin-top: 0.5rem;
+  background-color: var(--bg-elevated);
+  border: 1px dashed var(--border-hover);
+  border-radius: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: -0.01em;
+}
+
+.expandBtn:hover {
+  background-color: var(--border);
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.languageGridExpanded {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+
+/* 약간 튀는 언어들은 ellipsis 처리가 필요할 수 있어서 추가 */
+.languageGridExpanded .langOption {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.myGuestbooksTitle {
+  padding-bottom: 24px;
+}
+
+.myGuestbooksList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .languageGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .main {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .languageGrid {
+    grid-template-columns: 1fr;
+  }
+  .actions {
+    flex-direction: column;
+  }
+  .submitBtn, .backBtn {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -9,7 +9,7 @@ export function Footer() {
         <div className={styles.brand}>
           <p className={styles.brandName}>Good Bye! BOJ!</p>
           <p className={styles.brandDesc}>
-            16년간 대한민국 알고리즘 문화를 이끌어온 백준 온라인 저지를 기억합니다.
+            16년간 대한민국 알고리즘 문화를 이끌어온 백준 온라인 저지를 기억하며.
           </p>
         </div>
 
@@ -20,6 +20,7 @@ export function Footer() {
             <a href="/" className={styles.link}>홈</a>
             <a href="/guestbook" className={styles.link}>전체 방명록</a>
             <a href="/terms" className={styles.link}>이용약관</a>
+            <a href="https://github.com/aidengoldkr/BaekJoon-Memorial" className={styles.link}>Github</a>
           </div>
 
           <div className={styles.linkGroup}>
@@ -47,7 +48,7 @@ export function Footer() {
 
       {/* 하단 바 */}
       <div className={styles.bottom}>
-        <p className={styles.copyright}>© 2026 Made by Aidengoldkr With Rupital</p>
+        <p className={styles.copyright}>© 2026 Made by <a href="https://aidengoldkr.dev">Aidengoldkr</a> With <a href="https://rupital0815.kro.kr/">Rupital</a></p>
         <p className={styles.disclaimer}>백준 온라인 저지의 공식 서비스가 아닙니다.</p>
       </div>
     </footer>

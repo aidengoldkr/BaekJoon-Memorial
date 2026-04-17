@@ -36,9 +36,7 @@ export function Header({ userEmail, profile }: Props) {
         onClick={() => setOpen(true)}
         aria-label="메뉴 열기"
       >
-        <span />
-        <span />
-        <span />
+        MENU
       </button>
 
       {open && (

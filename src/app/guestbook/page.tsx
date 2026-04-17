@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getGuestbookPage } from "@/app/actions/guestbook";
+import { auth } from "@/lib/auth";
 import { GuestbookListClient } from "@/components/GuestbookListClient";
 import styles from "./guestbook.module.css";
 
@@ -19,6 +20,8 @@ export default async function GuestbookPage({
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
   const sort: Sort = params.sort === "likes" ? "likes" : "latest";
+
+  const session = await auth();
 
   const { entries, total } = await getGuestbookPage(page, PAGE_SIZE, sort);
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -65,6 +68,7 @@ export default async function GuestbookPage({
           page={page}
           sort={sort}
           pageSize={PAGE_SIZE}
+          currentUserEmail={session?.user?.email}
         />
 
         {/* 페이지네이션 */}

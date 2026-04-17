@@ -1,17 +1,22 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getMyProfile, upsertProfile } from "@/app/actions/profile";
+import { getMyGuestbooks } from "@/app/actions/guestbook";
+import { GuestbookCard } from "@/components/GuestbookCard";
 import { normalizeTier } from "@/components/TierBadge";
 import { TierSelect } from "@/components/TierSelect";
 import styles from "./mypage.module.css";
 
-const LANGUAGES = ["C++", "Python", "Java", "C", "Kotlin", "JavaScript", "TypeScript", "Go", "Rust"];
+import { LanguageSelector } from "./LanguageSelector";
 
 export default async function MyPage() {
   const session = await auth();
   if (!session?.user?.email) redirect("/login");
 
-  const profile = await getMyProfile();
+  const [profile, myGuestbooks] = await Promise.all([
+    getMyProfile(),
+    getMyGuestbooks()
+  ]);
 
   const currentTier = normalizeTier(profile?.tier);
   // 저장된 닉네임 → 없으면 Google 이름 → 없으면 이메일 앞부분
@@ -76,20 +81,7 @@ export default async function MyPage() {
           {/* 주력 언어 */}
           <div className={styles.formGroup}>
             <label className={styles.label}>주력 언어</label>
-            <div className={styles.languageGrid}>
-              {LANGUAGES.map((lang) => (
-                <label key={lang} className={styles.langOption}>
-                  <input
-                    type="checkbox"
-                    name="top_languages"
-                    value={lang}
-                    defaultChecked={profile?.top_languages?.includes(lang) ?? false}
-                    className={styles.checkbox}
-                  />
-                  {lang}
-                </label>
-              ))}
-            </div>
+            <LanguageSelector defaultSelected={profile?.top_languages || []} />
           </div>
 
           <div className={styles.actions}>
@@ -101,6 +93,23 @@ export default async function MyPage() {
             </a>
           </div>
         </form>
+
+        <div className={styles.myGuestbooksSection}>
+          <h2 className={styles.myGuestbooksTitle}>내 방명록</h2>
+          {myGuestbooks.length > 0 ? (
+            <div className={styles.myGuestbooksList}>
+              {myGuestbooks.map((entry) => (
+                <GuestbookCard 
+                  key={entry.id} 
+                  entry={entry as any} 
+                  currentUserEmail={session.user?.email} 
+                />
+              ))}
+            </div>
+          ) : (
+            <p className={styles.emptyGuestbook}>작성한 방명록이 없습니다.</p>
+          )}
+        </div>
       </div>
     </main>
   );

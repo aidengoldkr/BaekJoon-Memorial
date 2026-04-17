@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import styles from "./FloatingMessages.module.css";
 
 const SPEED = 90;          // px/s — 레퍼런스와 동일
-const TICK_MS = 150;       // ms — 레퍼런스와 동일
-const NUM_LANES = 10;
-const LANE_BUFFER_MS = 500;
+const TICK_MS = 100;       // ms — 더 자주 생성
+const NUM_LANES = 20;      // 더 많은 레인 사용
+const LANE_BUFFER_MS = 300; // 레인 간격 단축
 
 const FALLBACK_MESSAGES = [
   "백준과 함께한 모든 날들이 소중했습니다.",
@@ -28,12 +28,32 @@ interface ActiveComment {
   duration: number;
 }
 
-interface Props {
-  messages?: string[];
+interface Entry {
+  content: string;
+  flower_count: number;
 }
 
-export function FloatingMessages({ messages }: Props) {
-  const src = (messages && messages.length > 0) ? messages : FALLBACK_MESSAGES;
+interface Props {
+  entries?: Entry[];
+}
+
+export function FloatingMessages({ entries }: Props) {
+  const src = useMemo(() => {
+    // 50자 넘는 메시지 제외
+    const validEntries = (entries || []).filter(e => e.content.length <= 50);
+
+    if (validEntries.length === 0) return FALLBACK_MESSAGES;
+
+    if (validEntries.length < 10) {
+      // 10개 미만: 실제 메시지 + FALLBACK 믹스
+      return [...validEntries.map(e => e.content), ...FALLBACK_MESSAGES];
+    } else {
+      // 10개 이상: 좋아요(flower_count) 높은 순으로 정렬
+      return [...validEntries]
+        .sort((a, b) => b.flower_count - a.flower_count)
+        .map(e => e.content);
+    }
+  }, [entries]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const laneAvailableAt = useRef<number[]>(Array(NUM_LANES).fill(0));
@@ -42,46 +62,54 @@ export function FloatingMessages({ messages }: Props) {
   const [comments, setComments] = useState<ActiveComment[]>([]);
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+    
     const tick = () => {
       const container = containerRef.current;
-      if (!container) return;
+      if (!container) {
+        timer = setTimeout(tick, TICK_MS);
+        return;
+      }
 
       const now = Date.now();
       const containerW = container.clientWidth;
-      if (containerW === 0) return;
+      if (containerW === 0) {
+        timer = setTimeout(tick, TICK_MS);
+        return;
+      }
 
-      // 현재 사용 가능한 레인 목록
       const available = laneAvailableAt.current
         .map((t, i) => (now >= t ? i : -1))
         .filter((i): i is number => i >= 0);
 
-      if (available.length === 0) return;
+      // 확률적 생성 + 랜덤 딜레이로 가로 뭉침 방지
+      if (available.length > 0 && Math.random() < 0.6) {
+        const lane = available[Math.floor(Math.random() * available.length)];
+        const text = src[msgIndex.current % src.length];
+        msgIndex.current++;
 
-      // 랜덤 레인 선택
-      const lane = available[Math.floor(Math.random() * available.length)];
+        const estimatedTextWidth = text.length * 13 + 60;
+        const travel = containerW + estimatedTextWidth + 40;
+        
+        const variedSpeed = SPEED * (0.8 + Math.random() * 0.4);
+        const duration = travel / variedSpeed;
 
-      const text = src[msgIndex.current % src.length];
-      msgIndex.current++;
+        laneAvailableAt.current[lane] = now + duration * 1000 + LANE_BUFFER_MS;
 
-      // 이동 거리 추정: 컨테이너 너비 + 텍스트 너비 여유
-      const estimatedTextWidth = text.length * 13 + 60;
-      const travel = containerW + estimatedTextWidth + 40;
-      const duration = travel / SPEED;
+        const id = nextId.current++;
+        setComments(prev => [...prev, { id, text, lane, duration }]);
 
-      // 레인 잠금
-      laneAvailableAt.current[lane] = now + duration * 1000 + LANE_BUFFER_MS;
+        setTimeout(() => {
+          setComments(prev => prev.filter(c => c.id !== id));
+        }, (duration + 1.5) * 1000);
+      }
 
-      const id = nextId.current++;
-      setComments(prev => [...prev, { id, text, lane, duration }]);
-
-      // 애니메이션 종료 후 정리
-      setTimeout(() => {
-        setComments(prev => prev.filter(c => c.id !== id));
-      }, (duration + 1.5) * 1000);
+      const nextDelay = TICK_MS + Math.random() * (TICK_MS * 5); // 딜레이 폭 확대
+      timer = setTimeout(tick, nextDelay);
     };
 
-    const interval = setInterval(tick, TICK_MS);
-    return () => clearInterval(interval);
+    timer = setTimeout(tick, TICK_MS);
+    return () => clearTimeout(timer);
   }, [src]);
 
   return (

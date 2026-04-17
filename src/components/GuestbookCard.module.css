@@ -6,7 +6,7 @@
   border: 1px solid var(--border);
   border-left: 3px solid var(--border);
   border-radius: 0.875rem;
-  overflow: hidden;
+  /* overflow: hidden 삭제 - 팝업 짤림 방지 */
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
@@ -15,6 +15,7 @@
   border-left-color: var(--accent);
   transform: translateY(-2px);
   box-shadow: 0 8px 28px -4px var(--shadow);
+  z-index: 10;
 }
 
 /* ── 본문 ── */
@@ -93,6 +94,7 @@
   border-left: 1px solid var(--border);
   flex-shrink: 0;
   min-width: 56px;
+  border-radius: 0 0.875rem 0.875rem 0; /* 부모 card의 radius와 일치시킴 */
 }
 
 .likeBtn {
@@ -203,4 +205,112 @@
   padding: 0.125rem 0.4rem;
   color: var(--text-secondary);
   letter-spacing: 0.02em;
+  padding: 0.125rem 0.4rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+/* ── 메타 우측 영역 및 수정 모드 ── */
+.metaRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ownerActions {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.actionBtn:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+/* ── 수정 모드 에어리어 ── */
+.editArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editTextarea {
+  width: 100%;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.editTextarea:focus {
+  border-color: var(--accent);
+}
+
+.editActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editCount {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.editBtns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cancelBtn, .saveBtn {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.cancelBtn {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+.cancelBtn:hover { background: var(--border); }
+
+.saveBtn {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.saveBtn:hover:not(:disabled) { background: var(--accent-hover); }
+
+.saveBtn:disabled, .cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .body {
+    padding: 1rem;
+  }
+  .likeArea {
+    padding: 0 0.75rem;
+  }
 }

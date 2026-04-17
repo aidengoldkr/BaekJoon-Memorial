@@ -165,3 +165,18 @@
   font-size: 0.875rem;
   color: var(--border-hover);
 }
+
+@media (max-width: 768px) {
+  .inner {
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 3rem 1.5rem 5rem;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+}

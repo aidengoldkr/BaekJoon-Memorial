@@ -3,6 +3,16 @@
 import { auth } from "@/lib/auth";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
+// ── 내부 헬퍼: XSS 방지용 HTML 소독 ──────────────────────────────────────
+function sanitizeHtml(text: string) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ── 내부 헬퍼: 이메일 목록으로 프로필 맵 조회 ─────────────────────────
 async function fetchProfileMap(emails: string[]) {
   if (emails.length === 0) return new Map<string, ProfileData>();
@@ -16,6 +26,20 @@ async function fetchProfileMap(emails: string[]) {
   return new Map<string, ProfileData>(
     (data ?? []).map(({ email, ...rest }) => [email, rest])
   );
+}
+
+// ── 내부 헬퍼: 현재 유저가 좋아요한 entry_id 집합 조회 ──────────────
+async function fetchLikedIds(entryIds: string[], userEmail: string): Promise<Set<string>> {
+  if (entryIds.length === 0) return new Set();
+
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("guestbook_likes")
+    .select("entry_id")
+    .eq("email", userEmail)
+    .in("entry_id", entryIds);
+
+  return new Set((data ?? []).map((r) => r.entry_id));
 }
 
 type ProfileData = {
@@ -49,9 +73,14 @@ export async function createGuestbookEntry(content: string) {
 
   const dailyLimit: number = limitRow?.daily_limit ?? 1;
 
-  // 오늘(UTC 기준) 작성 수 확인
-  const todayStart = new Date();
-  todayStart.setUTCHours(0, 0, 0, 0);
+  // 오늘(KST 기준) 작성 수 확인
+  const now = new Date();
+  const krFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const parts = krFormatter.formatToParts(now);
+  const mapping = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  
+  // KST 기준 오늘의 자정 시각을 구한 뒤 ISOString으로 변환 (toISOString는 UTC 반환)
+  const todayStart = new Date(`${mapping.year}-${mapping.month}-${mapping.day}T00:00:00+09:00`);
 
   const { count: todayCount } = await supabase
     .from("guestbooks")
@@ -68,7 +97,7 @@ export async function createGuestbookEntry(content: string) {
 
   const { error } = await supabase.from("guestbooks").insert({
     email,
-    content: content.trim(),
+    content: sanitizeHtml(content.trim()),
     flower_count: 0,
   });
 
@@ -79,6 +108,8 @@ export async function createGuestbookEntry(content: string) {
 // ── 최근 방명록 조회 (메인 페이지 마키·폼 용) ─────────────────────────
 export async function getGuestbookEntries(limit?: number) {
   const supabase = createClient();
+  const session = await auth();
+  const userEmail = session?.user?.email ?? null;
 
   let query = supabase
     .from("guestbooks")
@@ -93,11 +124,15 @@ export async function getGuestbookEntries(limit?: number) {
 
   if (error || !data) return [];
 
-  const profileMap = await fetchProfileMap(data.map((e) => e.email));
+  const [profileMap, likedIds] = await Promise.all([
+    fetchProfileMap(data.map((e) => e.email)),
+    userEmail ? fetchLikedIds(data.map((e) => e.id), userEmail) : Promise.resolve(new Set<string>()),
+  ]);
 
   return data.map((entry) => ({
     ...entry,
     profiles: profileMap.get(entry.email) ?? null,
+    user_liked: likedIds.has(entry.id),
   }));
 }
 
@@ -108,6 +143,8 @@ export async function getGuestbookPage(
   sort: "latest" | "likes" = "latest"
 ) {
   const supabase = createClient();
+  const session = await auth();
+  const userEmail = session?.user?.email ?? null;
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
@@ -127,12 +164,16 @@ export async function getGuestbookPage(
 
   if (error || !data) return { entries: [], total: 0 };
 
-  const profileMap = await fetchProfileMap(data.map((e) => e.email));
+  const [profileMap, likedIds] = await Promise.all([
+    fetchProfileMap(data.map((e) => e.email)),
+    userEmail ? fetchLikedIds(data.map((e) => e.id), userEmail) : Promise.resolve(new Set<string>()),
+  ]);
 
   return {
     entries: data.map((entry) => ({
       ...entry,
       profiles: profileMap.get(entry.email) ?? null,
+      user_liked: likedIds.has(entry.id),
     })),
     total: count ?? 0,
   };
@@ -140,44 +181,99 @@ export async function getGuestbookPage(
 
 // ── 좋아요 추가 ────────────────────────────────────────────────────────
 export async function addFlower(id: string) {
+  const session = await auth();
+  if (!session?.user?.email)
+    return { success: false, error: "로그인이 필요합니다." };
+
   const supabase = createServiceClient();
+  const { error } = await supabase.rpc("add_flower", {
+    p_entry_id: id,
+    p_email: session.user.email,
+  });
 
-  const { error } = await supabase.rpc("increment_flower_count", { row_id: id });
-
-  if (error) {
-    const { data: entry } = await supabase
-      .from("guestbooks")
-      .select("flower_count")
-      .eq("id", id)
-      .single();
-
-    if (entry) {
-      await supabase
-        .from("guestbooks")
-        .update({ flower_count: entry.flower_count + 1 })
-        .eq("id", id);
-    }
-  }
-
+  if (error) return { success: false, error: error.message };
   return { success: true };
 }
 
 // ── 좋아요 취소 ────────────────────────────────────────────────────────
 export async function removeFlower(id: string) {
+  const session = await auth();
+  if (!session?.user?.email)
+    return { success: false, error: "로그인이 필요합니다." };
+
   const supabase = createServiceClient();
+  const { error } = await supabase.rpc("remove_flower", {
+    p_entry_id: id,
+    p_email: session.user.email,
+  });
 
-  const { data: entry } = await supabase
-    .from("guestbooks")
-    .select("flower_count")
-    .eq("id", id)
-    .single();
-
-  if (entry) {
-    await supabase
-      .from("guestbooks")
-      .update({ flower_count: Math.max(0, entry.flower_count - 1) })
-      .eq("id", id);
-  }
-
+  if (error) return { success: false, error: error.message };
   return { success: true };
+}
+
+// ── 본인 방명록 수정 ──────────────────────────────────────────────────
+export async function updateGuestbookEntry(id: string, newContent: string) {
+  const session = await auth();
+  if (!session?.user?.email)
+    return { success: false, error: "로그인이 필요합니다." };
+
+  if (!newContent || newContent.trim().length === 0)
+    return { success: false, error: "내용을 입력해주세요." };
+
+  if (newContent.length > 140)
+    return { success: false, error: "140자 이내로 입력해주세요." };
+
+  const supabase = createServiceClient();
+  const { error } = await supabase
+    .from("guestbooks")
+    .update({ content: sanitizeHtml(newContent.trim()) })
+    .eq("id", id)
+    .eq("email", session.user.email); // 본인 글만 수정
+
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
+// ── 본인 방명록 삭제 ──────────────────────────────────────────────────
+export async function deleteGuestbookEntry(id: string) {
+  const session = await auth();
+  if (!session?.user?.email)
+    return { success: false, error: "로그인이 필요합니다." };
+
+  const supabase = createServiceClient();
+  const { error } = await supabase
+    .from("guestbooks")
+    .delete()
+    .eq("id", id)
+    .eq("email", session.user.email); // 본인 글만 삭제
+
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
+// ── 내 방명록 목록(마이페이지 용) ──────────────────────────────────────
+export async function getMyGuestbooks() {
+  const session = await auth();
+  if (!session?.user?.email) return [];
+
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("guestbooks")
+    .select("id, email, content, flower_count, created_at")
+    .eq("email", session.user.email)
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+
+  const [profileMap, likedIds] = await Promise.all([
+    fetchProfileMap([session.user.email]),
+    fetchLikedIds(data.map((e) => e.id), session.user.email),
+  ]);
+  const myProfile = profileMap.get(session.user.email) ?? null;
+
+  return data.map((entry) => ({
+    ...entry,
+    profiles: myProfile,
+    user_liked: likedIds.has(entry.id),
+  }));
 }

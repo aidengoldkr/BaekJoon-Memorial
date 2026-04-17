@@ -13,9 +13,9 @@
   font-weight: 500;
   padding: 0.3rem 0.875rem;
   border-radius: 9999px;
-  background: rgba(0, 95, 154, 0.07);
+  background: var(--accent-bg);
   color: var(--text-secondary);
-  border: 1px solid rgba(0, 95, 154, 0.14);
+  border: 1px solid var(--accent-border);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   will-change: transform;
@@ -28,5 +28,12 @@
   }
   to {
     transform: translateY(-50%) translateX(calc(-100% - 20px));
+  }
+}
+
+@media (max-width: 768px) {
+  .comment {
+    opacity: 0.45;
+    font-size: 0.75rem;
   }
 }

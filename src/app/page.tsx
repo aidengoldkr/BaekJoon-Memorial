@@ -9,20 +9,20 @@ import { getGuestbookEntries } from '@/app/actions/guestbook';
 import { getMyProfile } from '@/app/actions/profile';
 import styles from './page.module.css';
 
+// ✅ 추가: 메인 페이지 강제 동적 렌더링 (캐시 무효화)
+export const dynamic = 'force-dynamic';
+
 export default async function LandingPage() {
   const [session, entries] = await Promise.all([
     auth(),
     getGuestbookEntries(),
   ]);
 
-
-
   // 최초 로그인: 프로필 미등록 → 마이페이지로 이동
   if (session?.user?.email) {
     const profile = await getMyProfile();
     if (!profile) redirect('/mypage');
   }
-
 
   return (
     <main className={styles.main}>
@@ -33,7 +33,6 @@ export default async function LandingPage() {
 
       {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
-
         <h1 className={styles.title}>
           Good Bye!
           <Image
@@ -55,6 +54,7 @@ export default async function LandingPage() {
           16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
           수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록하며.
         </p>
+        
         <div className={styles.guestbookInner}>
           <div className={styles.guestbookHeader}>
             <h2 className={styles.guestbookTitle}>방명록</h2>

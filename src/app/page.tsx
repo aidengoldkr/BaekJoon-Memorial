@@ -47,7 +47,7 @@ export default async function LandingPage() {
 
         <div className={styles.countdownWrapper}>
           <p className={styles.countdownLabel}>서비스 종료까지</p>
-          <CountdownTimer targetDate="2026-04-28T00:00:00" />
+          <CountdownTimer targetDate="2026-04-29T00:00:00" />
         </div>
 
         <p className={styles.description}>

@@ -46,15 +46,15 @@ export default async function LandingPage() {
         </h1>
 
         <div className={styles.countdownWrapper}>
-          <p className={styles.countdownLabel}>서비스 종료까지</p>
-          <CountdownTimer targetDate="2026-04-29T00:00:00" />
+          <p className={styles.countdownLabel}>문제 조회 오픈까지</p>
+          <CountdownTimer targetDate="2026-05-29T18:00:00" />
         </div>
 
         <p className={styles.description}>
           16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
           수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록하며.
         </p>
-        
+
         <div className={styles.guestbookInner}>
           <div className={styles.guestbookHeader}>
             <h2 className={styles.guestbookTitle}>방명록</h2>

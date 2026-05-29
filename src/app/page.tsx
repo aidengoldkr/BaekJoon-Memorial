@@ -9,7 +9,7 @@ import { getGuestbookEntries } from '@/app/actions/guestbook';
 import { getMyProfile } from '@/app/actions/profile';
 import styles from './page.module.css';
 
-// ✅ 추가: 메인 페이지 강제 동적 렌더링 (캐시 무효화)
+
 export const dynamic = 'force-dynamic';
 
 export default async function LandingPage() {
@@ -46,7 +46,7 @@ export default async function LandingPage() {
         </h1>
 
         <div className={styles.countdownWrapper}>
-          <p className={styles.countdownLabel}>문제 조회 오픈까지</p>
+          <p className={styles.countdownLabel}></p>
           <CountdownTimer targetDate="2026-05-29T18:00:00" />
         </div>
 

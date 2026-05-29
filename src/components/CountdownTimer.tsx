@@ -39,7 +39,7 @@ export function CountdownTimer({ targetDate }: Props) {
 
   if (!timeLeft) {
     return (
-      <p className={styles.ended}>서비스가 종료되었습니다.</p>
+      <p className={styles.ended}>채점 서비스 준비 중 입니다.</p>
     );
   }
 

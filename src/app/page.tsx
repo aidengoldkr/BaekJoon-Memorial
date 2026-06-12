@@ -34,7 +34,7 @@ export default async function LandingPage() {
       {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
         <h1 className={styles.title}>
-          Good Bye!
+          Welcome Back!
           <Image
             src="/asset/logo.png"
             alt="BOJ"
@@ -51,8 +51,7 @@ export default async function LandingPage() {
         </div>
 
         <p className={styles.description}>
-          16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
-          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록하며.
+          데이원컴퍼니, BOJ 인수<br />
         </p>
 
         <div className={styles.guestbookInner}>

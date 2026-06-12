@@ -75,7 +75,7 @@ export function GuestbookForm({ initialEntries, userEmail }: Props) {
               ref={textareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value.slice(0, MAX_LENGTH))}
-              placeholder="백준을 추억하며 마지막 한마디를 남겨주세요..."
+              placeholder="다시 돌아온 백준을 위해 한마디 남겨주세요"
               rows={2}
               className={styles.textarea}
               disabled={!userEmail}

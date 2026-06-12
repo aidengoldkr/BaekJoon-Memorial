@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://goodbye-boj.com"),
 
   title: {
-    default: "Good Bye! BOJ! - 백준 메모리얼",
+    default: "Welcome Back! BOJ! - 백준 메모리얼",
     template: "%s | Good Bye! BOJ!", // 하위 페이지 발생 시 타이틀 템플릿
   },
   description: "16년간 대한민국 알고리즘 트레이닝의 뿌리가 되어준 백준 온라인 저지(BOJ)의 마지막을 기억합니다. 우리의 치열했던 알고리즘 풀이 기록과 추억을 남겨주세요.",
@@ -22,15 +22,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: "https://goodbye-boj.com",
-    title: "Good Bye! BOJ! - 백준 메모리얼",
+    title: "Welcome Back! BOJ! - 백준 메모리얼",
     description: "16년간 대한민국 알고리즘 트레이닝의 뿌리가 되어준 백준 온라인 저지의 마지막을 기억하며.",
-    siteName: "Good Bye! BOJ!",
+    siteName: "Welcome Back! BOJ!",
     images: [
       {
         url: "/asset/og.png",
         width: 1200,
         height: 630,
-        alt: "Good Bye! BOJ! - 백준 메모리얼 오픈그래프 이미지",
+        alt: "Welcome Back! - 백준 메모리얼 오픈그래프 이미지",
       },
     ],
   },

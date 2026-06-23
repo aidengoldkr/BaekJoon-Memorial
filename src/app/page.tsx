@@ -34,7 +34,7 @@ export default async function LandingPage() {
       {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
         <h1 className={styles.title}>
-          Good Bye!
+          Welcome Back,
           <Image
             src="/asset/logo.png"
             alt="BOJ"
@@ -46,13 +46,13 @@ export default async function LandingPage() {
         </h1>
 
         <div className={styles.countdownWrapper}>
-          <p className={styles.countdownLabel}>서비스 종료까지</p>
+          <p className={styles.countdownLabel}>백준이 돌아온 지</p>
           <CountdownTimer targetDate="2026-04-29T00:00:00" />
         </div>
 
         <p className={styles.description}>
-          16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지.<br />
-          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 마지막 봄을 기록하며.
+          16년간 대한민국 알고리즘 문제풀이의 뿌리가 되어준 백준 온라인 저지가 돌아왔습니다.<br />
+          수만 번의 '맞았습니다!!'와 함께 성장한 우리들의 이야기를 여기에 남겨주세요.
         </p>
         
         <div className={styles.guestbookInner}>

@@ -39,7 +39,7 @@ export function CountdownTimer({ targetDate }: Props) {
 
   if (!timeLeft) {
     return (
-      <p className={styles.ended}>서비스가 종료되었습니다.</p>
+      <p className={styles.ended}>백준이 돌아왔습니다! 🎉</p>
     );
   }
 

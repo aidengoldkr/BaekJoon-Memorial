@@ -5,7 +5,7 @@ import { GuestbookListClient } from "@/components/GuestbookListClient";
 import styles from "./guestbook.module.css";
 
 export const metadata = {
-  title: "전체 방명록 — Good Bye! BOJ!",
+  title: "전체 방명록 — Welcome Back, Baekjoon!",
 };
 
 const PAGE_SIZE = 20;

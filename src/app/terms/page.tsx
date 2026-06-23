@@ -1,7 +1,7 @@
 import styles from "./terms.module.css";
 
 export const metadata = {
-  title: "이용약관 — Good Bye! BOJ!",
+  title: "이용약관 — Welcome Back, Baekjoon!",
 };
 
 export default function TermsPage() {
@@ -14,9 +14,8 @@ export default function TermsPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>1. 목적</h2>
           <p className={styles.text}>
-            본 서비스는 2026년 4월 28일 서비스 종료를 앞둔 백준 온라인 저지(Baekjoon Online Judge)를
-            추모하기 위한 메모리얼 사이트입니다. 이용자는 Google 계정으로 로그인하여 방명록에 메시지를
-            남길 수 있습니다.
+            본 서비스는 백준 온라인 저지(Baekjoon Online Judge)를 기념하기 위한 커뮤니티 메모리얼 사이트입니다.
+            이용자는 Google 계정으로 로그인하여 방명록에 메시지를 남길 수 있습니다.
           </p>
         </section>
 
@@ -39,7 +38,7 @@ export default function TermsPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>4. 면책</h2>
           <p className={styles.text}>
-            본 서비스는 백준 온라인 저지의 공식 서비스가 아닌 팬 메이드 추모 프로젝트입니다.
+            본 서비스는 백준 온라인 저지의 공식 서비스가 아닌 팬 메이드 커뮤니티 프로젝트입니다.
           </p>
         </section>
       </div>

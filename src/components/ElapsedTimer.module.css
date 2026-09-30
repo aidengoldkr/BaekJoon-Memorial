@@ -48,10 +48,3 @@
   text-transform: uppercase;
 }
 
-.ended {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  letter-spacing: 0.03em;
-}

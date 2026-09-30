@@ -1,7 +1,7 @@
 import styles from "./terms.module.css";
 
 export const metadata = {
-  title: "이용약관 — Welcome Back, Baekjoon!",
+  title: "이용약관 — Good Bye, Baekjoon!",
 };
 
 export default function TermsPage() {

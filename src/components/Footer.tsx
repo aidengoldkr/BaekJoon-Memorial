@@ -7,9 +7,9 @@ export function Footer() {
 
         {/* 브랜드 */}
         <div className={styles.brand}>
-          <p className={styles.brandName}>Welcome Back, Baekjoon!</p>
+          <p className={styles.brandName}>Good Bye, Baekjoon!</p>
           <p className={styles.brandDesc}>
-            16년간 대한민국 알고리즘 문화를 이끌어온 백준 온라인 저지의 귀환을 기념하며.
+            16년간 대한민국 알고리즘 문화를 이끌어온 백준 온라인 저지와 함께한 시간을 기억하며.
           </p>
         </div>
 

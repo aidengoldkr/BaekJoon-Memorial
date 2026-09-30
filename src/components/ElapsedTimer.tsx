@@ -1,22 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "./CountdownTimer.module.css";
+import styles from "./ElapsedTimer.module.css";
 
 interface Props {
-  targetDate: string;
+  startDate: string;
 }
 
-interface TimeLeft {
+interface ElapsedTime {
   days: number;
   hours: number;
   minutes: number;
   seconds: number;
 }
 
-function calcTimeLeft(target: string): TimeLeft | null {
-  const diff = new Date(target).getTime() - Date.now();
-  if (diff <= 0) return null;
+function calcElapsedTime(start: string): ElapsedTime {
+  const diff = Math.max(0, Date.now() - new Date(start).getTime());
   return {
     days: Math.floor(diff / (1000 * 60 * 60 * 24)),
     hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -25,29 +24,22 @@ function calcTimeLeft(target: string): TimeLeft | null {
   };
 }
 
-export function CountdownTimer({ targetDate }: Props) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(() =>
-    calcTimeLeft(targetDate)
-  );
+export function ElapsedTimer({ startDate }: Props) {
+  const [elapsedTime, setElapsedTime] = useState<ElapsedTime | null>(null);
 
   useEffect(() => {
+    setElapsedTime(calcElapsedTime(startDate));
     const timer = setInterval(() => {
-      setTimeLeft(calcTimeLeft(targetDate));
+      setElapsedTime(calcElapsedTime(startDate));
     }, 1000);
     return () => clearInterval(timer);
-  }, [targetDate]);
-
-  if (!timeLeft) {
-    return (
-      <p className={styles.ended}>채점 서비스 준비 중 입니다.</p>
-    );
-  }
+  }, [startDate]);
 
   const units = [
-    { label: "일", value: timeLeft.days },
-    { label: "시간", value: timeLeft.hours },
-    { label: "분", value: timeLeft.minutes },
-    { label: "초", value: timeLeft.seconds },
+    { label: "일", value: elapsedTime?.days },
+    { label: "시간", value: elapsedTime?.hours },
+    { label: "분", value: elapsedTime?.minutes },
+    { label: "초", value: elapsedTime?.seconds },
   ];
 
   return (
@@ -55,7 +47,7 @@ export function CountdownTimer({ targetDate }: Props) {
       {units.map(({ label, value }) => (
         <div key={label} className={styles.unit}>
           <span className={styles.number}>
-            {String(value).padStart(2, "0")}
+            {value === undefined ? "--" : String(value).padStart(2, "0")}
           </span>
           <span className={styles.label}>{label}</span>
         </div>

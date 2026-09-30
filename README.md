@@ -9,7 +9,7 @@
 
 ## 주요 기능
 
-- **카운트다운 타이머** — BOJ 서비스 종료일(2026-04-28)까지 남은 시간을 실시간으로 표시
+- **경과 시간 타이머** — 2026년 4월 28일 0시(KST)부터 흐른 일·시간·분·초를 실시간으로 표시
 - **방명록** — Google 로그인 후 추억의 한마디를 남기고, 다른 사람의 글에 좋아요(❤️) 반응 전송
 - **전체 방명록** — 최신순 / 좋아요순으로 정렬 가능한 페이지네이션 뷰
 - **플로팅 메시지 배경** — 방명록 메시지들이 화면을 가로질러 흘러가는 인터랙티브 배경
@@ -49,6 +49,26 @@ boj_rip/
         ├── auth.ts                   # NextAuth 설정
         └── supabase/server.ts        # Supabase 클라이언트 (읽기/쓰기 분리)
 ```
+
+---
+
+## 로컬 개발환경
+
+```bash
+npm ci
+cp .env.example .env.local
+# .env.local의 Supabase / Google OAuth 값을 입력
+npm run dev
+```
+
+- 개발 서버: http://localhost:3000
+- `AUTH_SECRET`: `openssl rand -base64 32`로 생성한 값을 입력합니다.
+- Google OAuth의 승인된 JavaScript 원본: `http://localhost:3000`
+- Google OAuth의 승인된 리디렉션 URI: `http://localhost:3000/api/auth/callback/google`
+- Supabase URL과 anon key, service role key는 기존 프로젝트의 API 설정에서 가져옵니다.
+- 기존 Supabase의 테이블 및 RPC가 필요합니다. 이 저장소에는 DB 마이그레이션이 포함되어 있지 않습니다.
+- `.env.local`은 Git에서 제외됩니다. service role key와 OAuth secret은 공개하거나 커밋하지 않습니다.
+- 검증: `npm run build`, `npx tsc --noEmit`
 
 ---
 

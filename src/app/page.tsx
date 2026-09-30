@@ -45,14 +45,14 @@ export default async function LandingPage() {
           />
         </h1>
 
+        <p className={styles.description}>
+          데이원컴퍼니, BOJ 인수<br />
+        </p>
+
         <div className={styles.countdownWrapper}>
           <p className={styles.countdownLabel}>2026년 4월 28일부터 함께 기억한 시간</p>
           <ElapsedTimer startDate="2026-04-28T00:00:00+09:00" />
         </div>
-
-        <p className={styles.description}>
-          데이원컴퍼니, BOJ 인수<br />
-        </p>
 
         <div className={styles.guestbookInner}>
           <div className={styles.guestbookHeader}>

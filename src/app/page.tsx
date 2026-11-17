@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { ElapsedTimer } from '@/components/ElapsedTimer';
+import { CountdownTimer } from '@/components/CountdownTimer';
 import { FloatingMessages } from '@/components/FloatingMessages';
 import { GuestbookForm } from '@/components/GuestbookForm';
 import { auth } from '@/lib/auth';
@@ -34,7 +34,7 @@ export default async function LandingPage() {
       {/* 2. 히어로 섹션 */}
       <section className={styles.heroSection}>
         <h1 className={styles.title}>
-          Good Bye!
+          Welcome Back!
           <Image
             src="/asset/logo.png"
             alt="BOJ"
@@ -50,8 +50,8 @@ export default async function LandingPage() {
         </p>
 
         <div className={styles.countdownWrapper}>
-          <p className={styles.countdownLabel}>2026년 4월 28일부터 함께 기억한 시간</p>
-          <ElapsedTimer startDate="2026-04-28T00:00:00+09:00" />
+          <p className={styles.countdownLabel}>2026년 11월 20일까지 남은 시간</p>
+          <CountdownTimer targetDate="2026-11-20T00:00:00+09:00" />
         </div>
 
         <div className={styles.guestbookInner}>
